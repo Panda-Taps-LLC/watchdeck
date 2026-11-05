@@ -207,13 +207,21 @@ main() {
 	done
 
 	# 4. sha256 of everything checksums.txt lists, and nothing else is listed.
+	# First every line: a name, one this script expects, a well-formed
+	# digest, and the file's sha256 equal to that line's digest (so a
+	# duplicate line with another digest cannot hide behind the first).
+	# Then every expected file: listed, one ok line each.
 	while read -r want name; do
 		[ -n "$want" ] || continue
 		name="${name#\*}"
+		[ -n "$name" ] || die "checksums.txt has a line with no file name: $want"
 		case " $listed " in
 		*" $name "*) ;;
 		*) die "checksums.txt lists $name, which this script does not expect; update its file list" ;;
 		esac
+		printf '%s\n' "$want" | grep -Eq '^[0-9a-fA-F]{64}$' || die "checksums.txt has a malformed entry for $name"
+		got="$(sha256_of "$rel/$name")"
+		[ "$got" = "$want" ] || die "checksum mismatch for $name (expected $want, got $got)"
 	done <"$rel/checksums.txt"
 	for f in $listed; do
 		want="$(awk -v f="$f" '$2 == f || $2 == "*" f { print $1; exit }' "$rel/checksums.txt")"

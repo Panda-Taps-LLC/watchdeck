@@ -70,10 +70,12 @@ unset WATCHDECK_VERIFY GH_TOKEN GITHUB_TOKEN GH_HOST GH_ENTERPRISE_TOKEN GITHUB_
 # one case can make one tool fail while the other passes. `gh auth status`
 # exits per $STUB_AUTH_RC, `gh release view` prints $STUB_DRAFT (false by
 # default) and `gh release download` copies the files of $STUB_REL into the
-# --dir argument, exiting per $STUB_DL_RC. $tmp/stubs-gh holds gh alone, for
-# the case without cosign.
+# --dir argument, exiting per $STUB_DL_RC. $tmp/stubs-gh holds gh alone and
+# $tmp/minbin only the tools verify-release.sh needs before its cosign
+# check, for the case without cosign (a trimmed PATH alone would still find
+# a real cosign installed later on PATH and run it against the fake bundle).
 export STUB_LOG="$tmp/stub.log"
-mkdir "$tmp/stubs" "$tmp/stubs-gh"
+mkdir "$tmp/stubs" "$tmp/stubs-gh" "$tmp/minbin"
 cat >"$tmp/stubs/gh" <<'STUB'
 #!/bin/sh
 printf '%s %s\n' "${0##*/}" "$*" >>"$STUB_LOG"
@@ -102,9 +104,14 @@ exit "${STUB_COSIGN_RC:-${STUB_RC:-0}}"
 STUB
 chmod 0755 "$tmp/stubs/gh" "$tmp/stubs/cosign"
 cp -p "$tmp/stubs/gh" "$tmp/stubs-gh/gh"
+for t in sh uname grep tar sha256sum shasum; do
+	if command -v "$t" >/dev/null 2>&1; then ln -s "$(command -v "$t")" "$tmp/minbin/$t"; fi
+done
 export PATH="$tmp/stubs:$PATH"
 [ "$(command -v gh)" = "$tmp/stubs/gh" ] || fail "the gh stub is not first on PATH"
 [ "$(command -v cosign)" = "$tmp/stubs/cosign" ] || fail "the cosign stub is not first on PATH"
+[ "$(PATH="$tmp/stubs-gh:$tmp/minbin" command -v cosign || true)" = "" ] || fail "cosign is reachable from the minimal PATH"
+[ "$(PATH="$tmp/stubs-gh:$tmp/minbin" command -v gh)" = "$tmp/stubs-gh/gh" ] || fail "the gh stub is not on the minimal PATH"
 
 cosign_line="cosign verify-blob --certificate-identity https://github.com/Panda-Taps-LLC/watchdeck/.github/workflows/release.yml@refs/tags/$tag --certificate-oidc-issuer https://token.actions.githubusercontent.com --bundle .*/checksums.txt.sigstore.json .*/checksums.txt\$"
 gh_line="gh attestation verify .*/watchdeck_${ver}_%s.tar.gz --repo Panda-Taps-LLC/watchdeck --signer-workflow Panda-Taps-LLC/watchdeck/.github/workflows/release.yml\$"
@@ -239,7 +246,8 @@ tmpdir_clean "case 7"
 echo "ok: a missing file refuses before any tool runs"
 
 # 8. checksums.txt that lists an unexpected file, or lacks a listed one,
-# refuses; a checksums.txt with a malformed digest refuses
+# refuses; a malformed digest, a nameless line and a duplicate line with a
+# wrong digest refuse
 build_release "$tmp/rel8" "$tag"
 echo "$(sha256_of "$tmp/rel8/checksums.txt.sigstore.json")  watchdeck_${ver}_windows_amd64.zip" >>"$tmp/rel8/checksums.txt"
 if sh "$verify" "$tag" --from "$tmp/rel8" >"$tmp/out8" 2>&1; then fail "unexpected listed file accepted"; fi
@@ -254,6 +262,17 @@ sed "s/^[0-9a-f]\{64\}  \($host\)$/abc  \1/" "$tmp/rel8c/checksums.txt" >"$tmp/r
 mv "$tmp/rel8c/c.tmp" "$tmp/rel8c/checksums.txt"
 if sh "$verify" "$tag" --from "$tmp/rel8c" >"$tmp/out8c" 2>&1; then fail "malformed digest accepted"; fi
 grep -q "FAIL: checksums.txt has a malformed entry for $host" "$tmp/out8c" || { cat "$tmp/out8c"; fail "no malformed-entry message"; }
+# a line with a digest and no name
+build_release "$tmp/rel8d" "$tag"
+echo "0000000000000000000000000000000000000000000000000000000000000000" >>"$tmp/rel8d/checksums.txt"
+if sh "$verify" "$tag" --from "$tmp/rel8d" >"$tmp/out8d" 2>&1; then fail "nameless digest line accepted"; fi
+grep -q "FAIL: checksums.txt has a line with no file name: 0000" "$tmp/out8d" || { cat "$tmp/out8d"; fail "no nameless-line message"; }
+# a duplicate line for a listed file with another digest (the first line is
+# right, the second is not): every line is checked, not the first match
+build_release "$tmp/rel8e" "$tag"
+echo "1111111111111111111111111111111111111111111111111111111111111111  $host" >>"$tmp/rel8e/checksums.txt"
+if sh "$verify" "$tag" --from "$tmp/rel8e" >"$tmp/out8e" 2>&1; then fail "duplicate line with a wrong digest accepted"; fi
+grep -q "FAIL: checksum mismatch for $host (expected 1111" "$tmp/out8e" || { cat "$tmp/out8e"; fail "no mismatch for the duplicate line"; }
 tmpdir_clean "case 8"
 echo "ok: checksums.txt must list exactly the release files with well-formed digests"
 
@@ -280,7 +299,7 @@ rm -f "$STUB_LOG"
 if STUB_AUTH_RC=1 sh "$verify" "$tag" --from "$tmp/rel" >"$tmp/out10" 2>&1; then fail "gh signed out accepted"; fi
 grep -q "FAIL: the GitHub CLI is not signed in (gh auth login)" "$tmp/out10" || { cat "$tmp/out10"; fail "no signed-out message"; }
 if grep -q "^cosign\|^gh attestation\|^gh release" "$STUB_LOG"; then fail "a check ran while gh was signed out"; fi
-if PATH="$tmp/stubs-gh:$(printf '%s' "$PATH" | sed "s|^$tmp/stubs:||")" sh "$verify" "$tag" --from "$tmp/rel" >"$tmp/out10b" 2>&1; then fail "missing cosign accepted"; fi
+if PATH="$tmp/stubs-gh:$tmp/minbin" sh "$verify" "$tag" --from "$tmp/rel" >"$tmp/out10b" 2>&1; then fail "missing cosign accepted"; fi
 grep -q "FAIL: need cosign 3.x" "$tmp/out10b" || { cat "$tmp/out10b"; fail "no missing-cosign message"; }
 for v in 9.9.9 'v1/../../../x' 'v1.2.3/..' 'v1.2' 'v1.2.3 x'; do
 	if sh "$verify" "$v" --from "$tmp/rel" >"$tmp/out10c" 2>&1; then fail "bad tag accepted: $v"; fi
