@@ -7,9 +7,15 @@ watchdeck shows every Claude Code session on your machine as a live map, every t
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Panda-Taps-LLC/watchdeck/main/scripts/install.sh | sh
 ```
-
-Add `--verify` (`curl … | sh -s -- --verify`) to check the release's provenance with the GitHub CLI or cosign before anything is installed. The script comes from the `main` branch and installs the latest release; `--version vX.Y.Z`, with the script fetched from that tag's URL instead of `main`, pins both. The repository and its release are not public yet, so this line does not work today. Build from source instead (Go 1.27+):
-
+Add `--verify` (`curl … | sh -s -- --verify`) to check the release's provenance with the GitHub CLI or cosign before anything is installed. The script comes from the `main` branch and installs the latest release; `--version vX.Y.Z`, with the script fetched from that tag's URL instead of `main`, pins both. Or from the Homebrew tap, whose formula is updated with each release:
+```sh
+brew install Panda-Taps-LLC/tap/watchdeck
+```
+Or, typed inside Claude Code, the plugin, which gives the band above the prompt, `/watchdeck:open` and `/watchdeck:status`; it needs the binary too, so it comes after one of the two installs above:
+```sh
+/plugin install watchdeck --marketplace Panda-Taps-LLC/watchdeck
+```
+The repository and its release are not public yet, so none of the three lines above works today. Build from source instead (Go 1.27+):
 ```sh
 git clone https://github.com/Panda-Taps-LLC/watchdeck && cd watchdeck
 go build -o ~/.local/bin/watchdeck ./cmd/watchdeck && watchdeck setup
@@ -19,7 +25,7 @@ go build -o ~/.local/bin/watchdeck ./cmd/watchdeck && watchdeck setup
 
 <sub>The left half of the GIF is a rendering of a terminal, labelled demo. The right half is the dashboard on a fixture home with synthetic sessions. How both were made: [docs/images/README.md](docs/images/README.md).</sub>
 
-**Status:** pre-release, 2026-10-20. macOS enforcement is verified end to end. Linux (bubblewrap) passes CI but has not run on a developer machine. License: Apache-2.0.
+**Status:** v0.1.0 (release date to be set at tag time). macOS enforcement is verified end to end. Linux (bubblewrap) passes CI but has not run on a developer machine. License: Apache-2.0.
 
 ## What it does
 
@@ -76,7 +82,7 @@ cosign verify-blob \
   --bundle checksums.txt.sigstore.json checksums.txt
 grep watchdeck_0.1.0_darwin_arm64.tar.gz checksums.txt | shasum -a 256 -c    # your archive; sha256sum -c on Linux
 ```
-A second channel, Rekor plus the workflow identity rather than a second download: `gh attestation verify watchdeck_0.1.0_darwin_arm64.tar.gz --repo Panda-Taps-LLC/watchdeck --signer-workflow Panda-Taps-LLC/watchdeck/.github/workflows/release.yml`. What a failure means and what to send us: [SECURITY.md](SECURITY.md#verify-a-release). The installer runs the `gh` line for you with `--verify` (the cosign line when `gh` is not signed in) and installs nothing when it fails; designed, not tested against a real release. The first signed release comes with the public repository.
+A second channel, Rekor plus the workflow identity rather than a second download: `gh attestation verify watchdeck_0.1.0_darwin_arm64.tar.gz --repo Panda-Taps-LLC/watchdeck --signer-workflow Panda-Taps-LLC/watchdeck/.github/workflows/release.yml`. What a failure means and what to send us: [SECURITY.md](SECURITY.md#verify-a-release). For maintainers, `scripts/verify-release.sh <tag>` runs both blocks and the checksum on every archive of a release. The installer runs the `gh` line for you with `--verify` (the cosign line when `gh` is not signed in) and installs nothing when it fails; designed, not tested against a real release. The first signed release comes with the public repository.
 
 ## Commands
 

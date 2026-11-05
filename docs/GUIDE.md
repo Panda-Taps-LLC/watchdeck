@@ -30,7 +30,19 @@ curl -fsSL https://raw.githubusercontent.com/Panda-Taps-LLC/watchdeck/main/scrip
 
 `scripts/install.sh` downloads `watchdeck_<version>_<darwin|linux>_<arm64|amd64>.tar.gz` and `checksums.txt` from the GitHub release, refuses on a sha256 mismatch, installs the binary in `~/.local/share/watchdeck/bin` (no sudo), links it into `~/.local/bin` when that directory is on your PATH, and then runs `watchdeck setup` on your terminal. `--no-setup` skips that last step, `--yes` answers its questions with the defaults, `--version vX.Y.Z` pins a release. Add `--verify` (`curl … | sh -s -- --verify`, or `WATCHDECK_VERIFY=1`) to check the release's provenance with the GitHub CLI or cosign before anything is installed: with `gh` signed in it runs `gh attestation verify` on the archive against this repository's release workflow; otherwise, with cosign 3.x, it checks the keyless bundle on `checksums.txt` for the release's tag; with neither it refuses, and nothing is installed when any check fails. The script comes from the `main` branch and installs the latest release; `--version vX.Y.Z`, with the script fetched from that tag's URL instead of `main` (`https://raw.githubusercontent.com/Panda-Taps-LLC/watchdeck/vX.Y.Z/scripts/install.sh`), pins both. To read it first: `curl -fsSLO …/install.sh && less install.sh && sh install.sh`.
 
-The repository is private and there is no release yet (2026-10-20), so the one-liner works once the owner publishes both. The installer is tested against a fake local release (`scripts/test-install.sh`, 14 cases, with stubs standing in for `gh` and cosign), not against GitHub; the verify step is designed, not tested against a real release, until the first public tag. `checksums.txt` comes from the same release as the archive, so the sha256 check alone catches a corrupt or truncated download, not a tampered release; `--verify` checks that (see [`SECURITY.md`](../SECURITY.md#verify-a-release), "Verify a release"). Until then, build from source (Go 1.27 or later):
+Or from the Homebrew tap, whose formula is updated with each release:
+
+```
+brew install Panda-Taps-LLC/tap/watchdeck
+```
+
+Or, typed inside Claude Code, the plugin, which gives the band above the prompt, `/watchdeck:open` and `/watchdeck:status`; it needs the binary too, so it comes after one of the two installs above:
+
+```
+/plugin install watchdeck --marketplace Panda-Taps-LLC/watchdeck
+```
+
+The repository is private and there is no release yet (2026-10-20), so the three lines above work once the owner publishes both. The installer is tested against a fake local release (`scripts/test-install.sh`, 14 cases, with stubs standing in for `gh` and cosign), not against GitHub; the verify step is designed, not tested against a real release, until the first public tag. `checksums.txt` comes from the same release as the archive, so the sha256 check alone catches a corrupt or truncated download, not a tampered release; `--verify` checks that (see [`SECURITY.md`](../SECURITY.md#verify-a-release), "Verify a release"). For maintainers, `scripts/verify-release.sh <tag>` runs both blocks and the checksum on every archive of a release. Until then, build from source (Go 1.27 or later):
 
 ```
 git clone https://github.com/Panda-Taps-LLC/watchdeck && cd watchdeck
