@@ -1,0 +1,44 @@
+pack: pipe-to-shell
+version: 1
+description: >-
+  Running a script fetched from the network without saving or reading it
+  first: curl/wget piped into a shell, a shell fed by <(curl ...) or
+  "$(curl ...)", or a download piped into an interpreter's stdin.
+rules:
+  - id: curl-pipe-shell
+    tool: Bash
+    match:
+      literals: [curl, wget]
+      regex: '\b(?:curl|wget)\b[^;&\n]*[^|]\|\s*(?:(?:sudo|doas|env)(?:\s+-\S+)*\s+(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*)?["'']?(?:\S*/)?(?:ba|z|da|k|fi|c|tc)?sh["'']?(?:\s|$|[;&|)])'
+    severity: high
+    action: ask
+    description: A download is piped straight into a shell (curl ... | sh).
+    fp_note: >-
+      Many real installers (rustup, nvm, uv) document exactly this, so the
+      default is ask, not deny: the person sees the URL and decides.
+      `curl -o file url`, `curl ... | jq`, `| shasum` and
+      `curl ... || bash other.sh` do not match.
+
+  - id: shell-process-substitution
+    tool: Bash
+    match:
+      literals: [curl, wget]
+      regex: '(?:\b(?:ba|z|k)?sh|\bsource|(?:^|[\s;&|(])\.)\s+(?:-\S+\s+)*<\(\s*(?:\S*/)?(?:curl|wget)\b|\b(?:(?:ba|z|k)?sh\s+-c|eval)\s+["'']?\$\(\s*(?:\S*/)?(?:curl|wget)\b'
+    severity: high
+    action: ask
+    description: A shell runs a download directly (bash <(curl ...), sh -c "$(curl ...)", eval "$(curl ...)").
+    fp_note: >-
+      Homebrew's installer is `/bin/bash -c "$(curl -fsSL ...)"`, so ask
+      rather than deny, for the same reason as curl-pipe-shell.
+
+  - id: pipe-to-interpreter
+    tool: Bash
+    match:
+      literals: [curl, wget]
+      regex: '\b(?:curl|wget)\b[^;&\n]*[^|]\|\s*(?:sudo(?:\s+-\S+)*\s+)?(?:\S*/)?(?:python[0-9.]*|perl|ruby|node|php)(?:\s+-)?\s*(?:$|[;&|)])'
+    severity: medium
+    action: log
+    description: A download is piped into an interpreter that runs stdin as a script (curl ... | python3).
+    fp_note: >-
+      New rule, logs for one release. `curl ... | python3 -m json.tool` and
+      `| python -c '...'` (stdin as data) do not match.

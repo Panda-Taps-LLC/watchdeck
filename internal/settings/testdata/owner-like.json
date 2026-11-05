@@ -1,0 +1,36 @@
+{
+  "env": {
+    "EXAMPLE_FLAG": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status *)"
+    ]
+  },
+  "model": "opus",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/example/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/example/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "example@marketplace": true
+  }
+}

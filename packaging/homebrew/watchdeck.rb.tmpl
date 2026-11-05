@@ -1,0 +1,47 @@
+# Template for the formula in a future tap, Panda-Taps-LLC/homebrew-tap
+# (Formula/watchdeck.rb). Not published: the tap repo does not exist and the
+# release is a draft. Fill VERSION (no leading v) and the four SHA256 values
+# from the release's checksums.txt, or let goreleaser's `brews:` block (see
+# .goreleaser.yaml, commented out) generate it.
+class Watchdeck < Formula
+  desc "Every Claude Code session as a live map; turn a denial into a rule in one click"
+  homepage "https://github.com/Panda-Taps-LLC/watchdeck"
+  version "{{VERSION}}"
+  license "Apache-2.0"
+
+  on_macos do
+    on_arm do
+      url "https://github.com/Panda-Taps-LLC/watchdeck/releases/download/v{{VERSION}}/watchdeck_{{VERSION}}_darwin_arm64.tar.gz"
+      sha256 "{{SHA256_DARWIN_ARM64}}"
+    end
+    on_intel do
+      url "https://github.com/Panda-Taps-LLC/watchdeck/releases/download/v{{VERSION}}/watchdeck_{{VERSION}}_darwin_amd64.tar.gz"
+      sha256 "{{SHA256_DARWIN_AMD64}}"
+    end
+  end
+
+  on_linux do
+    on_arm do
+      url "https://github.com/Panda-Taps-LLC/watchdeck/releases/download/v{{VERSION}}/watchdeck_{{VERSION}}_linux_arm64.tar.gz"
+      sha256 "{{SHA256_LINUX_ARM64}}"
+    end
+    on_intel do
+      url "https://github.com/Panda-Taps-LLC/watchdeck/releases/download/v{{VERSION}}/watchdeck_{{VERSION}}_linux_amd64.tar.gz"
+      sha256 "{{SHA256_LINUX_AMD64}}"
+    end
+  end
+
+  def install
+    bin.install "watchdeck"
+  end
+
+  def caveats
+    <<~EOS
+      Next: watchdeck setup
+    EOS
+  end
+
+  test do
+    assert_match "watchdeck", shell_output("#{bin}/watchdeck version")
+  end
+end

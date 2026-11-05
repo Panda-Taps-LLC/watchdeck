@@ -1,0 +1,76 @@
+{
+  "numStartups": 3,
+  "firstStartTime": "2026-10-14T00:53:53.857Z",
+  "userID": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mcpServers": {
+    "canary": {
+      "type": "stdio",
+      "command": "/usr/bin/python3",
+      "args": [
+        "/Users/you/mcp/server.py",
+        "--flag",
+        "a"
+      ],
+      "env": {
+        "FAKE_TOKEN": "fake-value-123"
+      }
+    },
+    "web": {
+      "type": "http",
+      "url": "https://example.invalid/mcp"
+    },
+    "events": {
+      "type": "sse",
+      "url": "https://example.invalid/sse"
+    },
+    "nourltype": {
+      "url": "https://example.invalid/mcp2"
+    },
+    "viajson": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@example/fake-mcp-server"
+      ],
+      "env": {
+        "A": "1"
+      }
+    },
+    "noargs": {
+      "type": "stdio",
+      "command": "/opt/fake/bin/server"
+    },
+    "unicode": {
+      "type": "stdio",
+      "command": "/opt/fake/bin/sérver",
+      "args": [
+        "<&>",
+        "✓  "
+      ],
+      "env": {}
+    }
+  },
+  "projects": {
+    "/Users/you/proj": {
+      "allowedTools": [],
+      "mcpServers": {
+        "loc": {
+          "type": "stdio",
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        }
+      },
+      "hasTrustDialogAccepted": false
+    }
+  },
+  "zLast": [
+    1,
+    2.50,
+    {
+      "a": null
+    }
+  ]
+}

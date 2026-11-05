@@ -1,0 +1,118 @@
+/* sessions page polish (2026-10-14). Loaded after app.css and map.css.
+   Calm layout: a one-line header, chip-free Live now cards, one filter row
+   (dates behind a disclosure), a lighter table. Tokens from app.css only. */
+
+.page-sessions { gap: 28px; }
+.page-sessions .page-head { align-items: baseline; gap: 4px 14px; }
+.page-sessions .page-head .lead { font-size: 13px; order: 0; flex: 0 1 auto; }
+.page-sessions .sx-stream { font-size: 12px; }
+
+/* ---- Live now: rows inside one cell, as on Home ---- */
+.page-sessions .sx-cards { display: flex; flex-direction: column; gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; }
+.page-sessions .sx-live { gap: 6px; padding: 12px 16px; border: 0; border-radius: 0; }
+.page-sessions .sx-live + .sx-live { border-top: 1px solid var(--line); }
+.page-sessions .sx-foot .btn, .page-home .sx-foot .btn { background: var(--surface); color: var(--ink); border: 1px solid var(--line-2); box-shadow: 0 1px 1px rgba(0, 0, 0, .05); font-weight: 400; }
+.page-sessions .sx-foot .btn:hover, .page-home .sx-foot .btn:hover { background: var(--bg); color: var(--ink); }
+.page-sessions .sx-live .sx-title { font-size: 13.5px; line-height: 1.45; }
+.page-sessions .sx-live .sx-title.muted { color: var(--muted); }
+.page-sessions .sx-meta,
+.page-sessions .sx-foot { flex-wrap: nowrap; }
+.page-sessions .sx-foot { margin-top: 2px; }
+.page-sessions .sx-foot .sx-path { flex: 1 1 auto; }
+.page-sessions .sx-foot .btn { flex: 0 0 auto; }
+.page-sessions .sx-meta .sx-deny { margin-left: auto; }
+.page-sessions .sx-none { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 2px; padding: 2px 0; }
+.page-sessions .sx-none p { margin: 0; }
+
+/* a denial count: small red text, no chip */
+.page-sessions .sx-deny { display: inline-flex; align-items: center; gap: 5px; flex: 0 0 auto; white-space: nowrap; color: var(--tone-deny); font-weight: 600; font-size: 12px; }
+.page-sessions .sx-meta .sx-deny::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--deny); }
+
+/* ---- filter row ---- */
+.page-sessions .sx-filters { align-items: center; gap: 8px; }
+.page-sessions .sx-field select { min-height: 34px; padding: 4px 10px; max-width: 260px; }
+.page-sessions .sx-check {
+  min-height: 34px; padding: 0 12px; gap: 7px; font-size: 13px; color: var(--ink-2);
+  border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--surface);
+  transition: border-color .15s var(--ease), background-color .15s var(--ease), color .15s var(--ease);
+}
+.page-sessions .sx-check:hover { border-color: var(--line-2); }
+.page-sessions .sx-check input { width: 14px; height: 14px; margin: 0; }
+.page-sessions .sx-check:has(input:checked) { border-color: var(--tone-deny); background: var(--tone-deny-bg); color: var(--tone-deny); }
+.page-sessions .sx-check:has(input:checked) input { accent-color: var(--deny); }
+.page-sessions .sx-check:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Dates: a small dropdown so the row stays one line */
+.page-sessions .sx-more { position: relative; }
+.page-sessions .sx-more > summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 34px; padding: 0 12px; border-radius: var(--r-ctl); border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink-2); font-size: 13px; font-weight: 500; white-space: nowrap;
+}
+.page-sessions .sx-more > summary::-webkit-details-marker { display: none; }
+.page-sessions .sx-more > summary::after {
+  content: ""; width: 6px; height: 6px; margin-left: 2px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg); transition: transform .15s var(--ease);
+}
+.page-sessions .sx-more[open] > summary::after { transform: translateY(1px) rotate(-135deg); }
+.page-sessions .sx-more > summary:hover { border-color: var(--line-2); }
+.page-sessions .sx-more > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.page-sessions .sx-more.on > summary { border-color: var(--accent); color: var(--link); font-family: var(--font-mono); font-size: 12px; }
+.page-sessions .sx-dates {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-ctl); box-shadow: var(--pop-shadow);
+}
+.page-sessions .sx-dates .sx-field { flex-direction: row; align-items: center; gap: 6px; }
+.page-sessions .sx-dates .sx-field input { min-height: 34px; padding: 4px 8px; }
+@media (max-width: 560px) { .page-sessions .sx-dates { left: auto; right: 0; flex-direction: column; align-items: stretch; } }
+.page-sessions .sx-clear { color: var(--muted); }
+.page-sessions .sx-clear:hover { color: var(--ink); }
+.page-sessions .sx-count { margin-left: auto; white-space: nowrap; }
+
+/* ---- table ---- */
+.page-sessions .sx-table td { padding: 12px 14px; border-bottom-color: var(--bg); vertical-align: middle; }
+.page-sessions .sx-table th { padding: 10px 14px; }
+.page-sessions .sx-table .sx-titlecell { max-width: 60ch; }
+.page-sessions .sx-table .sx-title { color: var(--ink-2); }
+.page-sessions .sx-table .sx-projcell .sx-path { margin-top: 2px; max-width: 30ch; }
+.page-sessions .sx-state.ended,
+.page-sessions .sx-state.unknown { color: var(--muted); }
+.page-sessions .sx-table tbody tr.click:hover,
+.page-sessions .sx-table tbody tr.click:focus-within { background: var(--bg); box-shadow: inset 3px 0 0 var(--accent); }
+.page-sessions .sx-table tbody tr.click:hover a.plain,
+.page-sessions .sx-table tbody tr.click:focus-within a.plain { color: var(--link); }
+.page-sessions .sx-table td.num .sx-deny { font-size: 13px; }
+@media (max-width: 760px) { .page-sessions .sx-table .sx-tools { display: none; } }
+.page-sessions .sx-table th.num { text-align: right; }
+
+/* ---- live lane map (Plan 04 Task 11, livemap.js) ----
+   A dark canvas strip over the Live now cards: one lane per live session,
+   glyphs flowing right with "now" at the right edge. --cv-* tokens only
+   (never redefined in dark mode, so the strip reads the same in both). */
+.page-sessions .sx-lanes:empty { display: none; }
+.lm { display: flex; flex-direction: column; gap: 6px; padding: 10px; background: var(--cv-bg); border: 1px solid var(--cv-line); border-radius: var(--r-card); color: var(--cv-ink); }
+.lm[hidden], .lm [hidden] { display: none; }
+.lm.empty { padding: 10px 14px; }
+.lm-lanes { display: flex; flex-direction: column; gap: 6px; }
+.lm-lane { display: block; padding: 6px 14px 2px; border-radius: 8px; background: var(--cv-panel); color: inherit; text-decoration: none; }
+.lm-lane:hover { background: var(--cv-grid); }
+.lm-lane:focus-visible { outline: 2px solid var(--cv-teal); outline-offset: 2px; }
+.lm-head { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 12px; color: var(--cv-muted); }
+.lm-lane:hover .lm-head, .lm-lane:focus-visible .lm-head { color: var(--cv-ink); }
+.lm-track { display: block; width: 100%; height: 30px; overflow: visible; }
+.lm-grid { stroke: var(--cv-grid); stroke-width: 1; }
+.lm-lane:hover .lm-grid { stroke: var(--cv-line); }
+.lm-base { stroke: var(--cv-line); stroke-width: 1; }
+.lm-now { stroke: var(--cv-teal); stroke-width: 2; stroke-linecap: round; }
+.lm-tick .lm-dot { stroke: var(--cv-bg); stroke-width: 1.5; fill: var(--cv-grey); }
+.lm-tick.allow .lm-dot { fill: var(--cv-green); }
+.lm-tick.ask .lm-dot { fill: var(--cv-amber); }
+.lm-tick.deny .lm-dot { fill: var(--cv-red); }
+.lm-tick .lm-ico { color: var(--cv-bg); pointer-events: none; }
+.lm-tick.none .lm-ico { color: var(--cv-ink); }
+.lm-axis { display: flex; justify-content: space-between; padding: 0 14px; font-size: 11px; color: var(--cv-dim); }
+.lm-more { align-self: flex-start; min-height: 30px; padding: 4px 12px; border: 1px solid var(--cv-line); border-radius: 8px; background: transparent; color: var(--cv-teal); font: inherit; font-size: 12px; cursor: pointer; }
+.lm-more:hover { background: var(--cv-panel); }
+.lm-more:focus-visible { outline: 2px solid var(--cv-teal); outline-offset: 2px; }
+.lm-none { margin: 0; font-size: 13px; text-align: left; color: var(--cv-muted); }

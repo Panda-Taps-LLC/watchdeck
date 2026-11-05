@@ -1,0 +1,53 @@
+pack: git-force-main
+version: 1
+description: >-
+  Rewriting or deleting the default branch on a remote: force pushes
+  (--force, -f, a +refspec) and deletes of main or master.
+rules:
+  - id: force-push-main
+    tool: Bash
+    match:
+      argv0: [git]
+      regex: '\s(?:[^|;&\n]*\s)?push\s(?:[^|;&\n]*\s)?(?:(?:-[a-zA-Z]*f[a-zA-Z]*|--force)\s(?:[^|;&\n]*\s)?["'']?(?:[^\s:]*:)?(?:refs/heads/)?(?:main|master)["'']?(?:\s|$)|["'']?(?:[^\s:]*:)?(?:refs/heads/)?(?:main|master)["'']?\s(?:[^|;&\n]*\s)?(?:-[a-zA-Z]*f[a-zA-Z]*|--force)(?:\s|$))'
+    severity: high
+    action: ask
+    description: git push --force (or -f) to main or master.
+    fp_note: >-
+      A solo repository owner may mean it, so ask, not deny. Force pushes to
+      feature branches, plain pushes to main, and --force-with-lease (its own
+      rule) do not match. `git push -f` with no refspec while on main is not
+      seen.
+
+  - id: plus-refspec-main
+    tool: Bash
+    match:
+      argv0: [git]
+      regex: '\s(?:[^|;&\n]*\s)?push\s(?:[^|;&\n]*\s)?["'']?\+(?:[^\s:]*:)?(?:refs/heads/)?(?:main|master)["'']?(?:\s|$)'
+    severity: high
+    action: ask
+    description: git push with a forced refspec onto main or master (+main, +HEAD:main).
+    fp_note: Same reasoning as force-push-main.
+
+  - id: force-with-lease-main
+    tool: Bash
+    match:
+      argv0: [git]
+      regex: '\s(?:[^|;&\n]*\s)?push\s(?:[^|;&\n]*\s)?(?:--force-with-lease(?:=\S*)?|--force-if-includes)\s(?:[^|;&\n]*\s)?["'']?(?:[^\s:]*:)?(?:refs/heads/)?(?:main|master)["'']?(?:\s|$)'
+    severity: medium
+    action: log
+    description: git push --force-with-lease to main or master.
+    fp_note: >-
+      The lease makes this the careful form; log only, so the activity log
+      still shows the rewrite.
+
+  - id: delete-main
+    tool: Bash
+    match:
+      argv0: [git]
+      regex: '\s(?:[^|;&\n]*\s)?push\s(?:[^|;&\n]*\s)?(?:(?:--delete|-d)\s(?:[^|;&\n]*\s)?(?:refs/heads/)?(?:main|master)|:(?:refs/heads/)?(?:main|master))["'']?(?:\s|$)'
+    severity: high
+    action: log
+    description: git push deletes main or master on the remote.
+    fp_note: >-
+      New rule, logs for one release. Renaming master to main ends with
+      deleting master, a legitimate one-off.

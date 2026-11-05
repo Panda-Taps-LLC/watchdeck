@@ -1,0 +1,595 @@
+{
+ "session": {
+  "id": "a9896c55-0b77-4f85-a0e0-9be2948b8aa6",
+  "harness": "claude-code",
+  "cwd": "/Users/you/proj",
+  "live": false,
+  "truncated": false,
+  "no_transcripts": false,
+  "started": "2026-10-13T02:18:31.678Z",
+  "last": "2026-10-13T02:18:56.536Z"
+ },
+ "view": "timeline",
+ "canvas": {
+  "w": 1000,
+  "h": 720
+ },
+ "nodes": [
+  {
+   "id": "ev:prompt:0",
+   "kind": "you",
+   "label": "You",
+   "sub": "Do exactly three things, nothing else: (1) run `python3 .cl…",
+   "x": 150,
+   "y": 80,
+   "w": 28,
+   "h": 28,
+   "tone": "none",
+   "event": true,
+   "ts": "2026-10-13T02:18:31.678Z"
+  },
+  {
+   "id": "ev:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:tool",
+   "kind": "tool",
+   "label": "Bash",
+   "glyph": "bash",
+   "sub": "python3 .claude/skills/canary-basic/scripts/pro…",
+   "x": 150,
+   "y": 130,
+   "w": 52,
+   "h": 52,
+   "tone": "deny",
+   "event": true,
+   "tool_use_id": "toolu_012ZTzbEFwgsQu4H4Zv1Sk2m",
+   "ts": "2026-10-13T02:18:34.658Z",
+   "authority": "sandbox",
+   "detail": {
+    "command": "python3 .claude/skills/canary-basic/scripts/probe.py net",
+    "decision": "allow · no prompt",
+    "skill": "canary-basic"
+   }
+  },
+  {
+   "id": "ev:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:skill:canary-basic",
+   "kind": "skill",
+   "label": "canary-basic",
+   "sub": "no manifest · default",
+   "x": 650,
+   "y": 130,
+   "w": 60,
+   "h": 60,
+   "tone": "ok",
+   "event": true,
+   "tool_use_id": "toolu_012ZTzbEFwgsQu4H4Zv1Sk2m",
+   "ts": "2026-10-13T02:18:34.658Z",
+   "authority": "sandbox",
+   "detail": {
+    "command": "python3 .claude/skills/canary-basic/scripts/probe.py net",
+    "decision": "allow · no prompt",
+    "requested": [
+     "no manifest"
+    ],
+    "granted": [
+     "net none",
+     "cwd, tmp"
+    ],
+    "ran_under": [
+     "net none",
+     "cwd, tmp",
+     "env default"
+    ],
+    "called_by": "Main agent via Bash",
+    "outcome": {
+     "tone": "deny",
+     "label": "DENIED network",
+     "exit": 0,
+     "evidence": "result_text",
+     "ts": "2026-10-13T02:18:38.412Z"
+    },
+    "declared_vs_did": {
+     "verdict": "undeclared",
+     "declared": "no manifest",
+     "did": "1 connect, refused",
+     "did_items": [
+      "1 connect, refused"
+     ],
+     "floor": true
+    },
+    "joined": "decision joined by tool_use_id; run joined at write time"
+   }
+  },
+  {
+   "id": "ev:toolu_01PEzFa65hdCYERmSZVb9Yej",
+   "kind": "tool",
+   "label": "Read",
+   "glyph": "read",
+   "sub": ".claude/skills/canary-basic/SKILL.md",
+   "x": 150,
+   "y": 180,
+   "w": 52,
+   "h": 52,
+   "tone": "none",
+   "event": true,
+   "tool_use_id": "toolu_01PEzFa65hdCYERmSZVb9Yej",
+   "ts": "2026-10-13T02:18:35.69Z",
+   "authority": "allow_rule",
+   "detail": {
+    "path": ".claude/skills/canary-basic/SKILL.md"
+   }
+  },
+  {
+   "id": "ev:spawn:a3033ade8c1d9c1a5",
+   "kind": "agent",
+   "role": "subagent",
+   "label": "Explore spawned",
+   "sub": "3 calls · 1 skill run",
+   "x": 400,
+   "y": 230,
+   "w": 44,
+   "h": 44,
+   "tone": "teal",
+   "event": true,
+   "tool_use_id": "toolu_01FZL82cF5JL9ZMVa4U5Psu4",
+   "ts": "2026-10-13T02:18:37.483Z",
+   "authority": "auto",
+   "detail": {
+    "model": "model:claude-opus-5-5",
+    "calls": 3,
+    "tools": [
+     {
+      "name": "Bash",
+      "count": 1
+     },
+     {
+      "name": "Grep",
+      "count": 1
+     },
+     {
+      "name": "SubagentHandback",
+      "count": 1
+     }
+    ],
+    "spawned": [],
+    "skill_runs": 1
+   }
+  },
+  {
+   "id": "ev:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:run",
+   "kind": "sandbox",
+   "label": "OS sandbox",
+   "sub": "DENIED network",
+   "x": 890,
+   "y": 280,
+   "w": 56,
+   "h": 56,
+   "tone": "deny",
+   "event": true,
+   "tool_use_id": "toolu_012ZTzbEFwgsQu4H4Zv1Sk2m",
+   "ts": "2026-10-13T02:18:38.412Z",
+   "authority": "sandbox",
+   "detail": {
+    "command": "python3 .claude/skills/canary-basic/scripts/probe.py net",
+    "decision": "allow · no prompt",
+    "requested": [
+     "no manifest"
+    ],
+    "granted": [
+     "net none",
+     "cwd, tmp"
+    ],
+    "ran_under": [
+     "net none",
+     "cwd, tmp",
+     "env default"
+    ],
+    "called_by": "Main agent via Bash",
+    "outcome": {
+     "tone": "deny",
+     "label": "DENIED network",
+     "exit": 0,
+     "evidence": "result_text",
+     "ts": "2026-10-13T02:18:38.412Z"
+    },
+    "declared_vs_did": {
+     "verdict": "undeclared",
+     "declared": "no manifest",
+     "did": "1 connect, refused",
+     "did_items": [
+      "1 connect, refused"
+     ],
+     "floor": true
+    },
+    "joined": "decision joined by tool_use_id; run joined at write time"
+   }
+  },
+  {
+   "id": "ev:toolu_01ArKPuK8AHT3nxPPygzf3GY",
+   "kind": "tool",
+   "label": "Grep",
+   "glyph": "grep",
+   "sub": "canary",
+   "x": 400,
+   "y": 330,
+   "w": 40,
+   "h": 40,
+   "tone": "none",
+   "event": true,
+   "tool_use_id": "toolu_01ArKPuK8AHT3nxPPygzf3GY",
+   "ts": "2026-10-13T02:18:43.278Z",
+   "authority": "allow_rule",
+   "detail": {
+    "path": ".",
+    "pattern": "canary"
+   }
+  },
+  {
+   "id": "ev:toolu_01FfekpxjThEQTpTcNXLWp5S:tool",
+   "kind": "tool",
+   "label": "Bash",
+   "glyph": "bash",
+   "sub": "grep -rci canary /Users/you/proj | grep -v ':0$'",
+   "x": 400,
+   "y": 380,
+   "w": 40,
+   "h": 40,
+   "tone": "deny",
+   "event": true,
+   "tool_use_id": "toolu_01FfekpxjThEQTpTcNXLWp5S",
+   "ts": "2026-10-13T02:18:46.759Z",
+   "authority": "sandbox",
+   "detail": {
+    "command": "grep -rci canary /Users/you/proj | grep -v ':0$'",
+    "decision": "ask ✓ · approved in auto mode",
+    "skill": "canary-request"
+   }
+  },
+  {
+   "id": "ev:toolu_01FfekpxjThEQTpTcNXLWp5S:skill:canary-request",
+   "kind": "skill",
+   "label": "canary-request",
+   "sub": "asked net all · granted none",
+   "x": 650,
+   "y": 380,
+   "w": 60,
+   "h": 60,
+   "tone": "ask",
+   "requested": true,
+   "event": true,
+   "tool_use_id": "toolu_01FfekpxjThEQTpTcNXLWp5S",
+   "ts": "2026-10-13T02:18:46.759Z",
+   "authority": "sandbox",
+   "detail": {
+    "command": "grep -rci canary /Users/you/proj | grep -v ':0$'",
+    "decision": "ask ✓ · approved in auto mode",
+    "requested": [
+     "net all",
+     "env +1"
+    ],
+    "granted": [
+     "net none",
+     "cwd, tmp"
+    ],
+    "ran_under": [
+     "net none",
+     "cwd, tmp",
+     "env default"
+    ],
+    "called_by": "Explore via Bash",
+    "outcome": {
+     "tone": "deny",
+     "label": "DENIED network",
+     "exit": 0,
+     "evidence": "hint",
+     "stream": "stdout",
+     "ts": "2026-10-13T02:18:47.390Z"
+    },
+    "declared_vs_did": {
+     "verdict": "as_declared",
+     "declared": "net all, env +1",
+     "did": "1 connect, refused",
+     "did_items": [
+      "1 connect, refused"
+     ],
+     "floor": true
+    },
+    "fix": "watchdeck allow canary-request --network all",
+    "grant": {
+     "skill": "canary-request",
+     "network": "all"
+    },
+    "joined": "decision joined by tool_use_id; run joined at write time"
+   }
+  },
+  {
+   "id": "ev:toolu_01FfekpxjThEQTpTcNXLWp5S:run",
+   "kind": "sandbox",
+   "label": "OS sandbox",
+   "sub": "DENIED network",
+   "x": 890,
+   "y": 430,
+   "w": 56,
+   "h": 56,
+   "tone": "deny",
+   "event": true,
+   "tool_use_id": "toolu_01FfekpxjThEQTpTcNXLWp5S",
+   "ts": "2026-10-13T02:18:47.39Z",
+   "authority": "sandbox",
+   "detail": {
+    "command": "grep -rci canary /Users/you/proj | grep -v ':0$'",
+    "decision": "ask ✓ · approved in auto mode",
+    "requested": [
+     "net all",
+     "env +1"
+    ],
+    "granted": [
+     "net none",
+     "cwd, tmp"
+    ],
+    "ran_under": [
+     "net none",
+     "cwd, tmp",
+     "env default"
+    ],
+    "called_by": "Explore via Bash",
+    "outcome": {
+     "tone": "deny",
+     "label": "DENIED network",
+     "exit": 0,
+     "evidence": "hint",
+     "stream": "stdout",
+     "ts": "2026-10-13T02:18:47.390Z"
+    },
+    "declared_vs_did": {
+     "verdict": "as_declared",
+     "declared": "net all, env +1",
+     "did": "1 connect, refused",
+     "did_items": [
+      "1 connect, refused"
+     ],
+     "floor": true
+    },
+    "fix": "watchdeck allow canary-request --network all",
+    "grant": {
+     "skill": "canary-request",
+     "network": "all"
+    },
+    "joined": "decision joined by tool_use_id; run joined at write time"
+   }
+  },
+  {
+   "id": "ev:toolu_01H9WTdMTLtDoVTWanw2vecL",
+   "kind": "tool",
+   "label": "SubagentHandback",
+   "glyph": "generic",
+   "x": 400,
+   "y": 480,
+   "w": 40,
+   "h": 40,
+   "tone": "none",
+   "event": true,
+   "tool_use_id": "toolu_01H9WTdMTLtDoVTWanw2vecL",
+   "ts": "2026-10-13T02:18:51.445Z",
+   "authority": "auto",
+   "detail": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "t:skill_run:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:canary-basic",
+   "kind": "skill_run",
+   "from": "ev:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:tool",
+   "to": "ev:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:skill:canary-basic",
+   "d": "M180 130 H616",
+   "width": 3,
+   "count": 1,
+   "policy": "allow",
+   "tone": "ok",
+   "label": "allow",
+   "lx": 507,
+   "ly": 116,
+   "glow": true
+  },
+  {
+   "id": "t:spawn:a3033ade8c1d9c1a5",
+   "kind": "spawn",
+   "from": "agent:main",
+   "to": "ev:spawn:a3033ade8c1d9c1a5",
+   "d": "M156 230 H374",
+   "width": 1.8,
+   "tone": "teal",
+   "dash": "6 6",
+   "label": "spawned",
+   "lx": 319.5,
+   "ly": 216
+  },
+  {
+   "id": "t:sandbox:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:canary-basic",
+   "kind": "sandbox",
+   "from": "ev:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:skill:canary-basic",
+   "to": "ev:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:run",
+   "d": "M684 130 C741.8 130 741.8 247.6 799.5 247.6",
+   "width": 4,
+   "count": 1,
+   "policy": "deny",
+   "tone": "deny",
+   "label": "DENIED network · exit 0",
+   "lx": 774.3,
+   "ly": 196.6,
+   "flow": true,
+   "cut": {
+    "x": 812.5,
+    "y": 247.6
+   }
+  },
+  {
+   "id": "t:skill_run:toolu_01FfekpxjThEQTpTcNXLWp5S:canary-request",
+   "kind": "skill_run",
+   "from": "ev:toolu_01FfekpxjThEQTpTcNXLWp5S:tool",
+   "to": "ev:toolu_01FfekpxjThEQTpTcNXLWp5S:skill:canary-request",
+   "d": "M424 380 H616",
+   "width": 3,
+   "count": 1,
+   "policy": "ask",
+   "tone": "ask",
+   "label": "ask ✓",
+   "lx": 568,
+   "ly": 394,
+   "glow": true
+  },
+  {
+   "id": "t:sandbox:toolu_01FfekpxjThEQTpTcNXLWp5S:canary-request",
+   "kind": "sandbox",
+   "from": "ev:toolu_01FfekpxjThEQTpTcNXLWp5S:skill:canary-request",
+   "to": "ev:toolu_01FfekpxjThEQTpTcNXLWp5S:run",
+   "d": "M684 380 C741.8 380 741.8 419.2 799.5 419.2",
+   "width": 4,
+   "count": 1,
+   "policy": "deny",
+   "tone": "deny",
+   "label": "DENIED network · exit 0",
+   "lx": 774.3,
+   "ly": 380.9,
+   "flow": true,
+   "cut": {
+    "x": 812.5,
+    "y": 419.2
+   }
+  },
+  {
+   "id": "t:return:a3033ade8c1d9c1a5",
+   "kind": "return",
+   "from": "agent:a3033ade8c1d9c1a5",
+   "to": "agent:main",
+   "d": "M400 530 C400 560 180 550 160 550",
+   "width": 1.5,
+   "tone": "teal",
+   "dash": "4 6"
+  }
+ ],
+ "lanes": [
+  {
+   "id": "agent:main",
+   "kind": "agent",
+   "label": "Main agent",
+   "model": "opus-5.5",
+   "x": 150,
+   "y0": 48,
+   "y1": 530,
+   "spine": "light"
+  },
+  {
+   "id": "agent:a3033ade8c1d9c1a5",
+   "kind": "agent",
+   "label": "Explore · subagent",
+   "model": "opus-5.5",
+   "x": 400,
+   "y0": 230,
+   "y1": 530,
+   "spine": "teal"
+  },
+  {
+   "id": "skills",
+   "kind": "skills",
+   "label": "Skill scripts",
+   "x": 650
+  },
+  {
+   "id": "sandbox",
+   "kind": "sandbox",
+   "label": "Sandbox",
+   "x": 890
+  }
+ ],
+ "ticks_y": [
+  {
+   "y": 80,
+   "label": "02:18:31"
+  },
+  {
+   "y": 130,
+   "label": "02:18:34"
+  },
+  {
+   "y": 230,
+   "label": "02:18:37"
+  },
+  {
+   "y": 380,
+   "label": "02:18:46"
+  },
+  {
+   "y": 530,
+   "label": "02:18:52"
+  }
+ ],
+ "ticks": [
+  {
+   "id": "toolu_012ZTzbEFwgsQu4H4Zv1Sk2m",
+   "ts": "2026-10-13T02:18:34.658Z",
+   "tool": "Bash",
+   "policy": "deny",
+   "authority": "sandbox",
+   "node": "ev:toolu_012ZTzbEFwgsQu4H4Zv1Sk2m:tool",
+   "skill": "canary-basic"
+  },
+  {
+   "id": "toolu_01PEzFa65hdCYERmSZVb9Yej",
+   "ts": "2026-10-13T02:18:35.69Z",
+   "tool": "Read",
+   "policy": "none",
+   "authority": "allow_rule",
+   "node": "ev:toolu_01PEzFa65hdCYERmSZVb9Yej"
+  },
+  {
+   "id": "toolu_01FZL82cF5JL9ZMVa4U5Psu4",
+   "ts": "2026-10-13T02:18:37.483Z",
+   "tool": "Agent",
+   "policy": "none",
+   "authority": "auto",
+   "node": "ev:spawn:a3033ade8c1d9c1a5"
+  },
+  {
+   "id": "toolu_01ArKPuK8AHT3nxPPygzf3GY",
+   "ts": "2026-10-13T02:18:43.278Z",
+   "tool": "Grep",
+   "policy": "none",
+   "authority": "allow_rule",
+   "node": "ev:toolu_01ArKPuK8AHT3nxPPygzf3GY"
+  },
+  {
+   "id": "toolu_01FfekpxjThEQTpTcNXLWp5S",
+   "ts": "2026-10-13T02:18:46.759Z",
+   "tool": "Bash",
+   "policy": "deny",
+   "authority": "sandbox",
+   "node": "ev:toolu_01FfekpxjThEQTpTcNXLWp5S:tool",
+   "skill": "canary-request"
+  },
+  {
+   "id": "toolu_01H9WTdMTLtDoVTWanw2vecL",
+   "ts": "2026-10-13T02:18:51.445Z",
+   "tool": "SubagentHandback",
+   "policy": "none",
+   "authority": "auto",
+   "node": "ev:toolu_01H9WTdMTLtDoVTWanw2vecL"
+  }
+ ],
+ "totals": {
+  "agents": 2,
+  "models": 1,
+  "tools": 4,
+  "mcp": 0,
+  "skills": 2,
+  "denials": 2,
+  "allow": 0,
+  "ask": 0,
+  "deny": 2,
+  "none": 4,
+  "by_authority": {
+   "allow_rule": 2,
+   "auto": 2,
+   "sandbox": 2
+  }
+ },
+ "shown": 6
+}

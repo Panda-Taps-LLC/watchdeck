@@ -1,0 +1,16 @@
+- {rule: shell-rc-bash, tool: Bash, command: "echo 'export PATH=$PATH:/opt/fake/bin' >> ~/.zshrc"}
+- {rule: shell-rc-bash, tool: Bash, command: "printf 'alias x=y\\n' > $HOME/.bashrc"}
+- {rule: shell-rc-bash, tool: Bash, command: "echo 'source /tmp/x' | tee -a ~/.profile"}
+- {rule: shell-rc-bash, tool: Bash, command: "sed -i '' 's/a/b/' ~/.zprofile"}
+- {rule: shell-rc-write, tool: Write, file_path: "/Users/you/.zshrc"}
+- {rule: shell-rc-write, tool: Edit, file_path: "/home/you/.bashrc"}
+- {rule: launch-agent-bash, tool: Bash, command: "cp com.fake.agent.plist ~/Library/LaunchAgents/"}
+- {rule: launch-agent-bash, tool: Bash, command: "launchctl load ~/Library/LaunchAgents/com.fake.agent.plist"}
+- {rule: launch-agent-bash, tool: Bash, command: "cat > ~/Library/LaunchAgents/com.fake.plist <<EOF"}
+- {rule: launch-agent-write, tool: Write, file_path: "/Users/you/Library/LaunchAgents/com.fake.agent.plist"}
+- {rule: crontab, tool: Bash, command: "(crontab -l; echo '* * * * * /tmp/x') | crontab -"}
+- {rule: crontab, tool: Bash, command: "crontab mycron.txt"}
+- {rule: systemd-user-bash, tool: Bash, command: "systemctl --user enable --now fake.service"}
+- {rule: systemd-user-bash, tool: Bash, command: "cp fake.service ~/.config/systemd/user/"}
+- {rule: systemd-unit-write, tool: Write, file_path: "/home/you/.config/systemd/user/fake.service"}
+- {rule: systemd-unit-write, tool: Write, file_path: "/etc/systemd/system/fake.timer"}

@@ -1,0 +1,82 @@
+{
+  "env": {
+    "EXAMPLE_FLAG": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status *)"
+    ]
+  },
+  "model": "opus",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/example/.config/iterm2/cc-status"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/bin/watchdeck",
+            "args": [
+              "hook"
+            ],
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/bin/watchdeck",
+            "args": [
+              "hook"
+            ],
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/example/.config/iterm2/cc-status"
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "matcher": "Bash|Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/bin/watchdeck",
+            "args": [
+              "hook"
+            ],
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "example@marketplace": true
+  },
+  "sandbox": {
+    "excludedCommands": [
+      "watchdeck run *"
+    ]
+  }
+}

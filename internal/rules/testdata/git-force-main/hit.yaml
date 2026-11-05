@@ -1,0 +1,12 @@
+- {rule: force-push-main, tool: Bash, command: "git push -f origin main"}
+- {rule: force-push-main, tool: Bash, command: "git push --force origin master"}
+- {rule: force-push-main, tool: Bash, command: "git push origin main --force"}
+- {rule: force-push-main, tool: Bash, command: "git push origin HEAD:main -f"}
+- {rule: force-push-main, tool: Bash, command: "git -C repo push -uf origin refs/heads/main"}
+- {rule: force-push-main, tool: Bash, command: "git push -f origin master:main"}
+- {rule: plus-refspec-main, tool: Bash, command: "git push origin +main"}
+- {rule: plus-refspec-main, tool: Bash, command: "git push origin +HEAD:main"}
+- {rule: force-with-lease-main, tool: Bash, command: "git push --force-with-lease origin main"}
+- {rule: force-with-lease-main, tool: Bash, command: "git push --force-with-lease=main:abc123 origin main"}
+- {rule: delete-main, tool: Bash, command: "git push origin --delete master"}
+- {rule: delete-main, tool: Bash, command: "git push origin :main"}

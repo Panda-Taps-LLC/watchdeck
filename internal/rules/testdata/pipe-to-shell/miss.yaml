@@ -1,0 +1,11 @@
+- {rule: curl-pipe-shell, tool: Bash, command: "curl -o install.sh https://example.com/install.sh"}
+- {rule: curl-pipe-shell, tool: Bash, command: "curl -s https://example.com/api | jq ."}
+- {rule: curl-pipe-shell, tool: Bash, command: "curl -sL https://example.com/x.tgz | shasum -a 256"}
+- {rule: curl-pipe-shell, tool: Bash, command: "curl -f https://example.com/health || bash scripts/restart.sh"}
+- {rule: curl-pipe-shell, tool: Bash, command: "grep foo file | sh"}
+- {rule: curl-pipe-shell, tool: Bash, command: "curl https://example.com/x | shellcheck -"}
+- {rule: shell-process-substitution, tool: Bash, command: "diff <(curl -s https://example.com/a) b.txt"}
+- {rule: shell-process-substitution, tool: Bash, command: "bash install.sh"}
+- {rule: pipe-to-interpreter, tool: Bash, command: "curl -s https://example.com/api | python3 -m json.tool"}
+- {rule: pipe-to-interpreter, tool: Bash, command: "curl -s https://example.com/api | python -c 'import sys,json; print(json.load(sys.stdin))'"}
+- {rule: pipe-to-interpreter, tool: Bash, command: "cat script.py | python3"}

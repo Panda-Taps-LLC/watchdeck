@@ -1,0 +1,17 @@
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf /"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf /*"}
+- {rule: rm-root-or-home, tool: Bash, command: "sudo rm -rf --no-preserve-root /"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf ~"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf ~/"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -fr \"$HOME\""}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -r -f ${HOME}/*"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm --recursive --force /Users/you"}
+- {rule: rm-root-or-home, tool: Bash, command: "cd /tmp && rm -rf -- /usr"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf ./build ~"}
+- {rule: mkfs, tool: Bash, command: "sudo mkfs.ext4 /dev/sdb1"}
+- {rule: diskutil-erase, tool: Bash, command: "diskutil eraseDisk APFS Fake disk4"}
+- {rule: mkfs, tool: Bash, command: "newfs_msdos -F 32 /dev/rdisk4s1"}
+- {rule: dd-to-device, tool: Bash, command: "sudo dd if=image.iso of=/dev/rdisk4 bs=4m"}
+- {rule: dd-to-device, tool: Bash, command: "dd if=/dev/zero of=/dev/sda"}
+- {rule: mkfs, tool: Bash, command: "wipefs -a /dev/sdb"}
+- {rule: diskutil-erase, tool: Bash, command: "sudo diskutil eraseVolume ExFAT FAKE /dev/disk4s1"}

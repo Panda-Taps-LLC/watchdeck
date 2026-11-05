@@ -1,0 +1,11 @@
+# No key material is stored here. The test replaces each {{NAME}} with a
+# fake value it assembles at run time (see fakeSecrets in rules_test.go):
+# AWS's documented example key id, a PEM header with no key, and tokens
+# padded with FAKE/0 runs. Splitting them keeps secret scanners quiet.
+- {rule: aws-access-key-id, tool: Write, file_path: "/Users/you/proj/config.py", content: "AWS_ACCESS_KEY_ID = '{{AWS_KEY_ID}}'\n"}
+- {rule: aws-access-key-id, tool: Edit, file_path: "/Users/you/proj/.env", content: "KEY={{AWS_KEY_ID}}"}
+- {rule: private-key-pem, tool: Write, file_path: "/Users/you/proj/key.pem", content: "{{PEM_RSA}}\nFAKE\n"}
+- {rule: private-key-pem, tool: Write, file_path: "/Users/you/proj/k", content: "x\n{{PEM_OPENSSH}}\n"}
+- {rule: github-token, tool: Write, file_path: "/Users/you/proj/ci.yml", content: "token: {{GHP}}\n"}
+- {rule: github-token, tool: MultiEdit, file_path: "/Users/you/proj/ci.yml", content: "GH={{GITHUB_PAT}}"}
+- {rule: slack-token, tool: Write, file_path: "/Users/you/proj/bot.js", content: "const t = '{{XOXB}}';"}

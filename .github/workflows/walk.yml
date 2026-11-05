@@ -1,0 +1,57 @@
+name: walk
+
+# The dashboard walkthrough (scripts/walk.sh) against a fixture home: the
+# route walk, the keyboard pass, axe, and the screenshot set. Run by hand
+# only (Actions, "walk", Run workflow); never on push, pull request or a
+# schedule. Playwright and axe are exact-pinned in scripts/walk/package.json.
+
+on:
+  workflow_dispatch:
+    inputs:
+      many:
+        description: "Synthetic sessions in the fixture home (fixture-home.sh --many)"
+        default: "400"
+        required: true
+      live:
+        description: "Live sessions among them (fixture-home.sh --live)"
+        default: "3"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  walk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: scripts/walk/package-lock.json
+      - name: Install the walk's packages
+        working-directory: scripts/walk
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Walk
+        env:
+          MANY: ${{ inputs.many }}
+          LIVE: ${{ inputs.live }}
+        run: |
+          set -o pipefail
+          mkdir -p out
+          scripts/walk.sh --many "$MANY" --live "$LIVE" --installed --keys --axe --screenshots out 2>&1 | tee out/walk.txt
+      - name: Upload the screenshots and the walk's table
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: walk
+          path: out/
+          if-no-files-found: warn

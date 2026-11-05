@@ -1,0 +1,85 @@
+# goreleaser v2 configuration. Dry run: goreleaser release --snapshot --clean --skip=sign
+# (keyless signing needs the release workflow's OIDC identity; skip it locally).
+# Builds are reproducible: -trimpath, an empty build id and file times from the
+# commit (docs/DESIGN.md section 12). The ci.yml repro jobs build the snapshot
+# twice on two runners and diff the binaries' sha256.
+version: 2
+
+project_name: watchdeck
+
+builds:
+  - id: watchdeck
+    main: ./cmd/watchdeck
+    binary: watchdeck
+    env:
+      - CGO_ENABLED=0
+    goos: [darwin, linux]
+    goarch: [arm64, amd64]
+    flags:
+      - -trimpath
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    ldflags:
+      - -s -w -buildid= -X main.version={{.Version}}
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - NOTICE
+      - README.md
+      - docs/DESIGN.md
+
+# One SPDX document per archive (<archive>.sbom.json), made by syft, which the
+# release workflow puts on PATH. goreleaser lists them in checksums.txt beside
+# the archives, so the signature and the attestation cover them too.
+sboms:
+  - artifacts: archive
+
+checksum:
+  name_template: checksums.txt
+
+# Keyless cosign signature of checksums.txt as one Sigstore bundle,
+# checksums.txt.sigstore.json (certificate and Rekor entry inside). The release
+# workflow passes --skip=sign while the repository is private: Rekor's log is
+# public and names the repository and workflow.
+signs:
+  - cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    args: ["sign-blob", "--bundle=${signature}", "${artifact}", "--yes"]
+    artifacts: checksum
+
+changelog:
+  use: git
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+release:
+  github:
+    owner: Panda-Taps-LLC
+    name: watchdeck
+  # owner publishes after review
+  draft: true
+
+# Homebrew: enable once the tap repo Panda-Taps-LLC/homebrew-tap exists and a
+# token with write access is in the release workflow (owner actions). A
+# hand-fillable formula template is in packaging/homebrew/watchdeck.rb.tmpl.
+# brews:
+#   - name: watchdeck
+#     repository:
+#       owner: Panda-Taps-LLC
+#       name: homebrew-tap
+#       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+#     homepage: https://github.com/Panda-Taps-LLC/watchdeck
+#     description: Every Claude Code session as a live map; turn a denial into a rule in one click
+#     license: Apache-2.0
+#     directory: Formula
+#     test: |
+#       assert_match "watchdeck", shell_output("#{bin}/watchdeck version")
+#
+# npm publishing waits for the npm scope (owner action). License: Apache-2.0
+# (chosen 2026-10-12).

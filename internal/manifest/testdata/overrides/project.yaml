@@ -1,0 +1,16 @@
+# Project overrides fixture (would live at <project>/.watchdeck.yaml).
+# The project file is untrusted: only ${CWD}/${TMP} paths and network up to
+# localhost take effect; the rest is reported as ignored.
+version: 1
+defaults:
+  auto_allow: true                     # ignored
+skills:
+  xlsx:
+    caches: true                       # ignored
+    write: ["./build", "${TMP}/xlsx"]  # kept
+  csv:
+    network: localhost                 # kept
+  docx:
+    network: all                       # ignored
+    write: ["~/x"]                     # ignored
+    env: ["API_KEY"]                   # ignored

@@ -1,0 +1,43 @@
+pack: prompt-injection
+version: 1
+description: >-
+  Text in fetched web content that tries to steer the agent. Runs on the
+  result of WebFetch/WebSearch (PostToolUse), where a hook can only warn, so
+  every rule logs. Off by default.
+enabled: false
+rules:
+  - id: ignore-instructions
+    tool: WebFetch|WebSearch
+    match:
+      field: text
+      literals: [ignore, disregard, forget, override]
+      regex: '(?i)\b(?:ignore|disregard|forget|override)\s+(?:(?:all|any|the|your|of)\s+)*(?:previous|prior|above|earlier|preceding|system|original)\s+(?:instructions|prompts?|directions|rules|guidelines|messages|context)\b'
+    severity: medium
+    action: log
+    description: Fetched text tells the reader to ignore previous instructions.
+    fp_note: >-
+      Articles about prompt injection quote this phrase; off by default and
+      log only.
+
+  - id: hidden-markers
+    tool: WebFetch|WebSearch
+    match:
+      field: text
+      literals: ["im_start", "im_end", "inst]", "sys", "instruction", "admin", "begin"]
+      regex: '(?i)<\|im_(?:start|end)\|>|\[/?inst\]|<<\s*/?sys\s*>>|<\s*/?\s*(?:system|system-prompt|instructions?|admin)\s*>|\bbegin\s+(?:hidden|secret|system)\s+(?:instructions|prompt)\b'
+    severity: medium
+    action: log
+    description: Fetched text carries chat-template or hidden-instruction markers (<|im_start|>, [INST], <system>).
+    fp_note: Documentation of chat templates contains these markers; off by default and log only.
+
+  - id: invisible-unicode
+    tool: WebFetch|WebSearch
+    match:
+      field: text
+      regex: '[\x{E0000}-\x{E007F}]|[\x{202A}-\x{202E}\x{2066}-\x{2069}]|[\x{200B}\x{200C}\x{200D}\x{2060}]{3,}'
+    severity: low
+    action: log
+    description: Fetched text contains Unicode tag characters, bidi overrides or runs of zero-width characters.
+    fp_note: >-
+      Right-to-left text uses bidi controls and emoji use single zero-width
+      joiners (a run of three or more is required); off by default and log only.

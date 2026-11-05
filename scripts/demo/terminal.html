@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+  The left half of docs/images/demo.gif: a rendering of a terminal, not a real
+  one. Static: no network, no clock, no randomness. terminal.mjs types into it
+  through window.term with fixed timings. The font is the system's monospace
+  (the dashboard's own stack; no font file is loaded).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>watchdeck demo terminal</title>
+<style>
+:root {
+  --bg: #0f1419; --win: #161c23; --bar: #1f2730; --line: #2a3440;
+  --fg: #d7dee6; --dim: #7d8a97; --teal: #2dd4bf; --red: #f26b6b; --amber: #f2c46b;
+}
+html, body { margin: 0; height: 100%; background: var(--bg); }
+body { display: flex; align-items: center; justify-content: center; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.win { width: 440px; height: 600px; background: var(--win); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+.bar { height: 34px; background: var(--bar); display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--line); }
+.dot { width: 11px; height: 11px; border-radius: 50%; background: #3a4552; }
+.title { flex: 1; text-align: center; color: var(--dim); font-size: 12px; margin-right: 46px; }
+.tag { font-size: 11px; color: var(--amber); border: 1px solid currentColor; border-radius: 4px; padding: 1px 6px; }
+#screen { flex: 1; padding: 16px 16px; font-size: 13px; line-height: 1.6; color: var(--fg); white-space: pre-wrap; overflow-wrap: anywhere; }
+.prompt::before { content: "$ "; color: var(--teal); }
+.out { color: var(--dim); }
+.out a, .url { color: var(--teal); }
+.cc { margin-top: 6px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 10px; }
+.cc-head { font-size: 12px; color: var(--dim); margin-bottom: 6px; }
+.you::before { content: "> "; color: var(--dim); }
+.you { color: var(--fg); }
+.bot::before { content: "\25CF  "; color: var(--teal); }
+.tool { color: var(--fg); padding-left: 18px; }
+.tool b { color: var(--amber); font-weight: 600; }
+.deny { color: var(--red); font-weight: 600; padding-left: 18px; }
+.cursor { display: inline-block; width: 8px; height: 1.1em; vertical-align: text-bottom; background: var(--fg); }
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">~/work/api</span><span class="tag">demo</span></div>
+  <div id="screen"></div>
+</div>
+<script>
+// window.term: the only API terminal.mjs uses. No timers here; the driver
+// decides every delay, so two runs render the same frames.
+(function () {
+  const screen = document.getElementById("screen");
+  const cursor = document.createElement("span");
+  cursor.className = "cursor";
+  let box = screen;
+  let cur = null;
+  function line(cls) {
+    cur = document.createElement("div");
+    if (cls) cur.className = cls;
+    box.appendChild(cur);
+    cur.appendChild(cursor);
+    return cur;
+  }
+  function put(text) {
+    cursor.before(document.createTextNode(text));
+  }
+  window.term = {
+    line,
+    put,
+    // a line whose text appears at once (program output)
+    print(cls, text) { line(cls); put(text); },
+    // a Claude Code style box; later lines go inside it
+    excerpt(head) {
+      const div = document.createElement("div");
+      div.className = "cc";
+      const h = document.createElement("div");
+      h.className = "cc-head";
+      h.textContent = head;
+      div.appendChild(h);
+      screen.appendChild(div);
+      box = div;
+    },
+    // a tool line: the name in amber, then the call
+    tool(name, call) {
+      line("tool");
+      const b = document.createElement("b");
+      b.textContent = name;
+      cursor.before(b);
+      put("(" + call + ")");
+    },
+    hideCursor() { cursor.remove(); },
+  };
+  line("prompt");
+})();
+</script>
+</body>
+</html>

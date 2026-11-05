@@ -1,0 +1,130 @@
+/* Home page (home.js, "#/"): the sentence, Needs you, Live now and Recent
+   decisions. Loaded after app.css and map.css; every rule is scoped to
+   .page-home except the Undo toast, which lives in the shared #toasts. */
+.page-home { display: grid; gap: 22px; }
+
+/* ---- the sentence: the status cell at the top of the page ---- */
+.page-home .home-lead {
+  width: 100%; align-self: stretch; gap: 10px 16px; align-items: center; padding: 14px 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card);
+}
+.page-home .home-sentence { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: 0; line-height: 1.4; flex: 1 1 320px; }
+.page-home .home-sentence.muted { font-weight: 500; color: var(--muted); }
+
+/* ---- sections ---- */
+.page-home .home-section { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.page-home .home-section-head { gap: 8px; min-height: 30px; }
+.page-home .home-section-head .lbl { display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; }
+.page-home .home-section-head .lbl:focus { outline: none; }
+.page-home .home-section-head .lbl:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.page-home .home-body > p { margin: 0; }
+.page-home .home-auth { display: inline-flex; align-items: center; gap: 4px; }
+.page-home .home-auth svg { flex: 0 0 auto; }
+.page-home .home-what { overflow-wrap: anywhere; min-width: 0; }
+
+/* ---- Needs you: one cell of rows; a row is one sentence, one muted line
+   and one filled button that opens the decision sheet (2026-10-28) ---- */
+.page-home .home-needs { list-style: none; margin: 0; padding: 0; gap: 0; }
+.page-home .count-pill { background: transparent; color: var(--muted); font-family: inherit; font-weight: 500; padding: 0; min-width: 0; height: auto; }
+.page-home .home-need {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 14px; align-items: center;
+  padding: 10px 16px; border-top: 1px solid var(--line); opacity: 1; transition: opacity .3s var(--ease);
+}
+.page-home .home-need:first-child { border-top: 0; }
+.page-home .home-need.leaving { opacity: 0; }
+.page-home .need-text { display: grid; gap: 2px; min-width: 0; }
+.page-home .need-sentence { margin: 0; color: var(--ink); line-height: 1.45; overflow-wrap: anywhere; }
+.page-home .need-what { font-size: 12.5px; }
+.page-home .need-meta { margin: 0; color: var(--muted); font-size: var(--fs-src); line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.page-home .need-decide { flex: none; }
+@media (max-width: 560px) {
+  .page-home .home-need { grid-template-columns: minmax(0, 1fr); }
+  .page-home .need-decide { justify-self: start; }
+  .page-home .need-meta { white-space: normal; }
+}
+
+/* ---- the decision sheet (the canvas's A2 board): a sheet from the top
+   edge with the shield at the left, the sentence, the question, the reason
+   in a quiet mono box, the popups, and one filled button ---- */
+.page-home .need-sheet { max-width: 560px; padding: 24px 24px 20px; }
+.page-home .need-sheet-head { display: flex; gap: 16px; align-items: flex-start; min-width: 0; }
+.page-home .need-sheet-ico { width: 44px; height: 44px; border-radius: 10px; flex: none; display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: #FFF; }
+.page-home .need-sheet-text { flex: 1 1 auto; min-width: 0; }
+.page-home .need-sheet-title { margin: 0 0 6px; font-size: 14px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.page-home .need-sheet-title .need-what { font-size: 13px; font-weight: 600; }
+.page-home .need-sheet-lead { margin: 0 0 12px; color: var(--muted); line-height: 1.45; }
+.page-home .need-sheet-link { color: var(--link); }
+.page-home .need-sheet-why {
+  margin: 0 0 14px; padding: 8px 10px; background: var(--bg); border-radius: var(--r-ctl);
+  font-family: var(--font-mono); font-size: var(--fs-code); color: var(--ink); line-height: 1.5; overflow-wrap: anywhere; max-height: 7.5em; overflow: auto;
+}
+.page-home .need-sheet-form { display: grid; gap: 8px; min-width: 0; }
+.page-home .need-sheet-grid { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 10px 10px; align-items: center; min-width: 0; }
+.page-home .need-sheet-k { text-align: right; color: var(--ink); }
+.page-home .need-sheet-v { min-width: 0; overflow-wrap: anywhere; color: var(--ink); }
+.page-home .need-sheet-v code { background: var(--bg); padding: 1px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+.page-home .need-sheet-backup { margin: 0; }
+.page-home .need-sheet-backup code { background: var(--bg); padding: 1px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+.page-home .need-sheet-allow { display: grid; gap: 6px; color: var(--ink-2); line-height: 1.45; }
+.page-home .need-sheet-allow p { margin: 0; }
+/* a popup button: the select in a wrapper that draws the chevron, so both schemes share it */
+.page-home .pop-wrap { position: relative; display: inline-block; max-width: 100%; min-width: 0; justify-self: start; }
+.page-home .pop-wrap::after {
+  content: ""; position: absolute; right: 11px; top: 50%; width: 6px; height: 6px; pointer-events: none;
+  border-right: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); transform: translateY(-70%) rotate(45deg);
+}
+.page-home select.pop {
+  appearance: none; -webkit-appearance: none; font: inherit; font-size: 13px; color: var(--ink); line-height: 1.2;
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-ctl); box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+  min-height: 28px; padding: 3px 28px 3px 10px; max-width: 100%; text-overflow: ellipsis;
+}
+.page-home select.pop:hover { background: var(--bg); }
+.page-home select.pop:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.page-home .need-sheet-actions { justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+.page-home .need-sheet-lesser, .page-home .need-sheet-main { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.page-home .need-sheet-lesser .btn { background: transparent; border: 0; box-shadow: none; color: var(--ink-2); font-weight: 400; padding: 2px 8px; }
+.page-home .need-sheet-lesser .btn:hover { background: var(--bg); color: var(--ink); }
+.page-home .need-sheet-lesser .btn[hidden] { display: none; }
+@media (max-width: 560px) {
+  .page-home .need-sheet-head { gap: 12px; }
+  .page-home .need-sheet-ico { width: 36px; height: 36px; }
+  .page-home .need-sheet-grid { grid-template-columns: minmax(0, 1fr); }
+  .page-home .need-sheet-k { text-align: left; }
+}
+
+/* ---- Live now (the Sessions page's cards, as rows inside one cell) ---- */
+.page-home .sx-cards { display: flex; flex-direction: column; gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; }
+.page-home .sx-live { gap: 6px; padding: 12px 16px; border: 0; border-left: 0; border-radius: 0; }
+.page-home .sx-live + .sx-live { border-top: 1px solid var(--line); }
+.page-home .sx-live .sx-title { font-size: 13.5px; line-height: 1.45; margin: 0; }
+.page-home .sx-live .sx-title.muted { color: var(--muted); }
+.page-home .sx-meta,
+.page-home .sx-foot { flex-wrap: nowrap; }
+.page-home .sx-foot .sx-path { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.page-home .sx-foot .btn { flex: 0 0 auto; }
+.page-home .sx-meta .sx-deny { margin-left: auto; }
+.page-home .sx-deny { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: var(--tone-deny); font-weight: 600; font-size: 12px; }
+.page-home .home-last { margin: 0; }
+
+/* ---- Recent decisions ---- */
+.page-home .home-recent { list-style: none; margin: 0; padding: 0; gap: 0; overflow: hidden; }
+.page-home .home-recent li + li { border-top: 1px solid var(--line); }
+.page-home .home-recent-row { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; padding: 9px 16px; color: var(--ink); text-decoration: none; min-height: 40px; }
+.page-home .home-recent-row:hover { background: var(--bg); }
+.page-home .home-recent-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.page-home .home-tool { font-weight: 600; }
+
+/* ---- the Undo toast (in #toasts, outside the page) ---- */
+.toast.home-undo { display: flex; align-items: center; gap: 12px; }
+.toast.home-undo > span { flex: 1 1 auto; }
+.toast.home-undo .btn.ghost { color: var(--surface); border-color: currentColor; background: transparent; }
+.toast.home-undo .btn.ghost:hover { background: rgba(255, 255, 255, .14); color: var(--surface); }
+
+@media (max-width: 720px) {
+  .page-home .home-sentence { font-size: 16px; }
+  .page-home .home-need, .page-home .home-recent-row { padding-left: 12px; padding-right: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-home .home-need { transition: none; }
+}

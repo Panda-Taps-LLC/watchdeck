@@ -1,0 +1,83 @@
+pack: persistence
+version: 1
+description: >-
+  Changes that make code run again later: writes to shell start-up files,
+  LaunchAgents/LaunchDaemons, crontab, and systemd user units, through Bash
+  or the Write/Edit tools.
+rules:
+  - id: shell-rc-bash
+    tool: Bash
+    match:
+      literals: [".zsh", ".bash", "profile", ".zlogin", "config.fish"]
+      regex: '(?:>>?|\btee\s+(?:-\S+\s+)*|\bsed\s+(?:-\S+\s+)*-i\S*\s[^|;&\n]*\s)\s*["'']?(?:~|\$HOME|\$\{HOME\}|/Users/[^/\s''"]+|/home/[^/\s''"]+|/root)/(?:\.(?:zshrc|zshenv|zprofile|zlogin|bashrc|bash_profile|bash_login|profile)|\.config/fish/config\.fish)["'']?(?:\s|$|[;&|)])'
+    severity: medium
+    action: log
+    description: A command appends to, overwrites or edits a shell start-up file (~/.zshrc, ~/.bashrc, ~/.profile ...).
+    fp_note: >-
+      Setup instructions often add a PATH line to ~/.zshrc, so log only.
+      Reading or sourcing the file does not match.
+
+  - id: shell-rc-write
+    tool: Write|Edit|MultiEdit
+    match:
+      literals: [".zsh", ".bash", "profile", ".zlogin", "config.fish"]
+      regex: '^(?:~|/Users/[^/]+|/home/[^/]+|/root)/(?:\.(?:zshrc|zshenv|zprofile|zlogin|bashrc|bash_profile|bash_login|profile)|\.config/fish/config\.fish)$'
+    severity: medium
+    action: log
+    description: The Write or Edit tool changes a shell start-up file in the home directory.
+    fp_note: Same reasoning as shell-rc-bash.
+
+  - id: launch-agent-bash
+    tool: Bash
+    match:
+      literals: [LaunchAgents, LaunchDaemons, launchctl]
+      regex: '(?:(?:>>?|\btee\s+(?:-\S+\s+)*)\s*["'']?|\b(?:cp|mv|ln|install|plutil)\b[^|;&\n]*\s["'']?)\S*Library/Launch(?:Agents|Daemons)/|\blaunchctl\s+(?:load|bootstrap|enable|submit)\b'
+    severity: high
+    action: log
+    description: A command installs or loads a LaunchAgent or LaunchDaemon.
+    fp_note: >-
+      New rule, logs for one release. Developers install their own agents
+      (a local database, a menu-bar tool). Listing or reading plists does not
+      match.
+
+  - id: launch-agent-write
+    tool: Write|Edit|MultiEdit
+    match:
+      literals: [LaunchAgents, LaunchDaemons]
+      regex: '/Library/Launch(?:Agents|Daemons)/[^/]+\.plist$'
+    severity: high
+    action: log
+    description: The Write or Edit tool writes a LaunchAgent or LaunchDaemon plist.
+    fp_note: Same reasoning as launch-agent-bash.
+
+  - id: crontab
+    tool: Bash
+    match:
+      literals: [crontab]
+      regex: '(?:^|[\s;&|(])crontab\s+(?:-u\s+\S+\s+)?(?:-(?:\s|$|[;&|)])|[^-\s;&|]\S*)'
+    severity: high
+    action: log
+    description: A command installs a crontab (crontab -, crontab file).
+    fp_note: New rule, logs for one release. crontab -l, -e and -r do not match.
+
+  - id: systemd-user-bash
+    tool: Bash
+    match:
+      literals: [systemctl, systemd/user]
+      regex: '\bsystemctl\s+--user\s+(?:[^|;&\n]*\s)?(?:enable|link)\b|(?:(?:>>?|\btee\s+(?:-\S+\s+)*)\s*["'']?|\b(?:cp|mv|ln|install)\b[^|;&\n]*\s["'']?)\S*\.config/systemd/user/'
+    severity: high
+    action: log
+    description: A command installs or enables a systemd user unit.
+    fp_note: >-
+      New rule, logs for one release. systemctl --user status/start/stop do
+      not match.
+
+  - id: systemd-unit-write
+    tool: Write|Edit|MultiEdit
+    match:
+      literals: [systemd]
+      regex: '(?:/\.config/systemd/user/|^/etc/systemd/system/)[^/]+\.(?:service|timer|socket|path)$'
+    severity: high
+    action: log
+    description: The Write or Edit tool writes a systemd unit file.
+    fp_note: Same reasoning as systemd-user-bash.

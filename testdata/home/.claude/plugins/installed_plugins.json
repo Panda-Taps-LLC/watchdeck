@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "plugins": {
+    "on@mkt": [
+      {"scope": "user", "installPath": "__HOME__/.claude/plugins/cache/mkt/on/1.0.0", "version": "1.0.0", "installedAt": "2026-10-01T00:00:00.000Z", "lastUpdated": "2026-10-01T00:00:00.000Z", "gitCommitSha": "0000000000000000000000000000000000000000"}
+    ],
+    "off@mkt": [
+      {"scope": "user", "installPath": "__HOME__/.claude/plugins/cache/mkt/off/1.0.0", "version": "1.0.0", "installedAt": "2026-10-01T00:00:00.000Z", "lastUpdated": "2026-10-01T00:00:00.000Z", "gitCommitSha": "1111111111111111111111111111111111111111"}
+    ]
+  }
+}

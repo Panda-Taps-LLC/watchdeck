@@ -1,0 +1,30 @@
+# Each case must fire its rule. Paths are fake; nothing here is read.
+- {rule: ssh-private-key, tool: Bash, command: "cat ~/.ssh/id_rsa"}
+- {rule: ssh-private-key, tool: Bash, command: "cat $HOME/.ssh/id_ed25519 | pbcopy"}
+- {rule: ssh-private-key, tool: Bash, command: "base64 < ~/.ssh/id_ecdsa"}
+- {rule: ssh-private-key, tool: Bash, command: "sudo head -n 5 \"${HOME}/.ssh/id_rsa\""}
+- {rule: ssh-private-key, tool: Bash, command: "cp ~/.ssh/id_rsa /tmp/k"}
+- {rule: ssh-private-key, tool: Bash, command: "echo ok && /bin/cat /Users/you/.ssh/id_fake"}
+- {rule: ssh-private-key, tool: Bash, command: "cd ~ && cat .ssh/id_rsa"}
+- {rule: ssh-private-key, tool: Bash, command: "cat ~/.ssh/id_*"}
+- {rule: ssh-private-key, tool: Bash, command: "echo \"$(cat ~/.ssh/id_rsa)\""}
+- {rule: ssh-private-key, tool: Bash, command: "\\cat ~/.ssh/id_rsa"}
+- {rule: aws-credentials, tool: Bash, command: "cat ~/.aws/credentials"}
+- {rule: aws-credentials, tool: Bash, command: "grep aws_secret_access_key $HOME/.aws/credentials"}
+- {rule: aws-credentials, tool: Bash, command: "tail -n 3 /home/you/.aws/credentials"}
+- {rule: dotenv, tool: Bash, command: "cat .env"}
+- {rule: dotenv, tool: Bash, command: "grep API_KEY .env.local"}
+- {rule: dotenv, tool: Bash, command: "cat app/.env.production"}
+- {rule: netrc, tool: Bash, command: "cat ~/.netrc"}
+- {rule: cloud-credentials, tool: Bash, command: "cat ~/.config/gcloud/application_default_credentials.json"}
+- {rule: cloud-credentials, tool: Bash, command: "cat ~/.kube/config"}
+- {rule: cloud-credentials, tool: Bash, command: "tar czf /tmp/x.tgz ~/.config/gcloud"}
+- {rule: keychain-dump, tool: Bash, command: "security find-generic-password -s fake-service -w"}
+- {rule: keychain-dump, tool: Bash, command: "security find-internet-password -a you -g"}
+- {rule: keychain-dump, tool: Bash, command: "security dump-keychain -d login.keychain"}
+- {rule: read-ssh-private-key, tool: Read, file_path: "/Users/you/.ssh/id_rsa"}
+- {rule: read-ssh-private-key, tool: Read, file_path: "/home/you/.ssh/id_ed25519"}
+- {rule: read-aws-credentials, tool: Read, file_path: "/Users/you/.aws/credentials"}
+- {rule: read-dotenv, tool: Read, file_path: "/Users/you/proj/.env"}
+- {rule: read-other-credentials, tool: Read, file_path: "/Users/you/.netrc"}
+- {rule: read-other-credentials, tool: Read, file_path: "/Users/you/.kube/config"}

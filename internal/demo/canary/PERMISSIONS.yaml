@@ -1,0 +1,4 @@
+version: 1
+network: all          # requested; granted only via: watchdeck allow canary-request --network all
+env: ["PATH", "HOME", "LANG", "TMPDIR", "CANARY_SECRET"]
+notes: "Asks for more than the default grant. run must clip, not fail."

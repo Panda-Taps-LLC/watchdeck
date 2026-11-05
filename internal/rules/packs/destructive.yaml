@@ -1,0 +1,55 @@
+pack: destructive
+version: 1
+description: >-
+  Commands that wipe a home directory, the root file system or a disk:
+  recursive rm of /, ~ or $HOME, mkfs/newfs/diskutil erase, dd onto a disk
+  device.
+rules:
+  - id: rm-root-or-home
+    tool: Bash
+    match:
+      argv0: [rm]
+      regex: '\s--no-preserve-root\b|\s(?:-[a-zA-Z]*[rR][a-zA-Z]*|--recursive)\s(?:[^|;&\n]*\s)?["'']?(?:/|~|\$HOME|\$\{HOME\}|(?:/Users|/home)(?:/[^/\s''"]+)?|/(?:bin|boot|dev|etc|lib|lib64|opt|private|root|sbin|usr|var|System|Library|Applications|Volumes))/?\*?["'']?(?:\s|$)'
+    severity: critical
+    action: ask
+    description: rm -r of /, /*, ~, $HOME, a home directory or a top-level system directory.
+    fp_note: >-
+      Only the exact roots match: rm -rf ./build, rm -rf ~/proj/node_modules,
+      rm -rf /tmp/x and rm -rf "$TMPDIR/x" do not. An empty variable
+      (rm -rf "$DIR/") cannot be seen here. Nobody wants this from an agent;
+      ask until the owner reviews the packs (log/ask only).
+
+  - id: mkfs
+    tool: Bash
+    match:
+      literals: [mkfs, mke2fs, newfs, wipefs]
+      argv0: [mkfs, mkfs.ext2, mkfs.ext3, mkfs.ext4, mkfs.xfs, mkfs.btrfs, mkfs.vfat, mkfs.fat, mkfs.exfat, mkfs.ntfs, mke2fs, newfs, newfs_msdos, newfs_apfs, newfs_hfs, newfs_exfat, wipefs]
+    severity: high
+    action: ask
+    description: A file system is created with mkfs or newfs (or wiped with wipefs).
+    fp_note: >-
+      Formatting a USB stick is a real if rare task, so ask rather than
+      deny. Only the command itself matches, not the word in an argument
+      (grep mkfs notes.md).
+
+  - id: diskutil-erase
+    tool: Bash
+    match:
+      argv0: [diskutil]
+      regex: '\s(?:eraseDisk|eraseVolume|zeroDisk|randomDisk|secureErase|partitionDisk|reformat|apfs\s+deleteContainer)\b'
+    severity: high
+    action: ask
+    description: diskutil erases or repartitions a disk.
+    fp_note: Same reasoning as mkfs; diskutil list and info do not match.
+
+  - id: dd-to-device
+    tool: Bash
+    match:
+      literals: ["of=/dev/"]
+      regex: '\bdd\b[^|;&\n]*\bof=["'']?/dev/(?:r?disk[0-9]|sd[a-z]|nvme[0-9]|hd[a-z]|mmcblk[0-9]|xvd[a-z]|vd[a-z])'
+    severity: high
+    action: ask
+    description: dd writes onto a whole disk device.
+    fp_note: >-
+      Flashing an image onto removable media is legitimate, so ask.
+      of=/dev/null and of=./file do not match.

@@ -1,0 +1,325 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# One run per branch: a newer push cancels the older run still in progress.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: true
+      - name: Install bubblewrap (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq bubblewrap
+          echo "apparmor_restrict_unprivileged_userns=$(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null || echo n/a)"
+          # Ubuntu 24.04 blocks unprivileged user namespaces by default; CI relaxes it so bwrap can run.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          bwrap --ro-bind / / --dev /dev --proc /proc --unshare-net -- /bin/true && echo "bwrap ok"
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: go test ./...
+
+  lint:
+    # staticcheck for both GOOS from one Linux runner (CGO is off, so the
+    # darwin-only files analyse under GOOS=darwin). go vet stays in `test`.
+    # The tool is installed by version through the Go checksum database and
+    # never enters go.mod (CONTRIBUTING, three dependencies).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: true
+      - name: Install staticcheck
+        run: GOBIN="$RUNNER_TEMP/bin" go install honnef.co/go/tools/cmd/staticcheck@v0.8.2
+      - name: staticcheck (linux)
+        run: GOOS=linux "$RUNNER_TEMP/bin/staticcheck" ./...
+      - name: staticcheck (darwin)
+        run: GOOS=darwin "$RUNNER_TEMP/bin/staticcheck" ./...
+      - name: go.mod and go.sum untouched
+        run: git diff --exit-code -- go.mod go.sum
+
+  vuln:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: true
+      - name: Install govulncheck
+        run: GOBIN="$RUNNER_TEMP/bin" go install golang.org/x/vuln/cmd/govulncheck@v1.8.0
+      - name: govulncheck (linux)
+        run: GOOS=linux "$RUNNER_TEMP/bin/govulncheck" ./...
+      - name: govulncheck (darwin)
+        run: GOOS=darwin "$RUNNER_TEMP/bin/govulncheck" ./...
+      - name: go.mod and go.sum untouched
+        run: git diff --exit-code -- go.mod go.sum
+
+  install:
+    # scripts/test-install.sh: builds the binary itself, fakes a release in a
+    # temp dir, exports a temp HOME; fourteen cases, prints PASS. Case 7 runs
+    # `setup --yes` and `uninstall --yes` in that home; on Linux it needs
+    # bubblewrap, else it skips.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: true
+      - name: Install bubblewrap (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq bubblewrap
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          bwrap --ro-bind / / --dev /dev --proc /proc --unshare-net -- /bin/true && echo "bwrap ok"
+      - name: Installer test
+        run: sh scripts/test-install.sh
+
+  plugin:
+    # `claude plugin validate --strict` and `claude plugin test` need no
+    # sign-in or network (Claude Code CLI reference, fetched 2026-10-20). The
+    # tests mock every process and file call (plugin/tests/harness.ts). tsc
+    # is not run: its types come from a `--plugin-dir` load and are gitignored.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CI: "1"
+      DISABLE_AUTOUPDATER: "1"
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+      - name: Install Claude Code 2.1.304
+        run: npm install -g @anthropic-ai/claude-code@2.1.304
+      - name: Isolate Claude Code's config
+        run: |
+          mkdir -p "$RUNNER_TEMP/claude-config"
+          echo "CLAUDE_CONFIG_DIR=$RUNNER_TEMP/claude-config" >> "$GITHUB_ENV"
+      - name: Validate (strict)
+        run: claude plugin validate plugin --strict
+      - name: Mod tests
+        run: claude plugin test plugin
+
+  fuzz:
+    # 20 s per target. A crasher lands in <pkg>/testdata/fuzz/<Target>/<id>
+    # and is uploaded; add it to the package's seed corpus with the fix.
+    # None of the three needs a sandbox binary: FuzzGatesNeverAllow skips
+    # Bash and asserts only "never allow", FuzzEval and FuzzParsePolicyFile
+    # are pure.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: FuzzEval
+            pkg: ./internal/rules
+          - target: FuzzGatesNeverAllow
+            pkg: ./internal/hook
+          - target: FuzzParsePolicyFile
+            pkg: ./internal/policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: true
+      - name: Fuzz ${{ matrix.target }}
+        run: go test -run='^$' -fuzz='^${{ matrix.target }}$' -fuzztime=20s ${{ matrix.pkg }}
+      - name: Upload the crasher
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fuzz-crasher-${{ matrix.target }}
+          path: ${{ matrix.pkg }}/testdata/fuzz/${{ matrix.target }}/
+          if-no-files-found: warn
+
+  latency:
+    # The hook fast path, BEFORE vs HEAD on the same runner, with the script's
+    # own +1 ms median / +2 ms p95 acceptance (CHECK=1 -> exit 2). Advisory:
+    # exit 2 becomes a warning annotation; any other failure fails the job.
+    # The gate for a tag is the owner's-machine measurement in CONTRIBUTING.
+    # The script prepends /opt/homebrew/bin and /usr/local/go/bin to PATH, so
+    # a runner's own Go can shadow setup-go's; both binaries build with the
+    # same toolchain either way (go.mod's go line) and the check is relative.
+    # Read the script's `go:` line in the log.
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0          # the script builds BEFORE in a worktree
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: true
+      - name: Measure (BEFORE vs HEAD)
+        id: measure
+        continue-on-error: true
+        env:
+          # PR: the base commit. Push: the previous tip, so a multi-commit push
+          # measures the whole push.
+          BEFORE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          N: "200"
+          CHECK: "1"
+        run: |
+          # A first push has an all-zero `before`, which is not a commit.
+          git cat-file -e "$BEFORE" 2>/dev/null || BEFORE=HEAD~1
+          export BEFORE
+          rc=0
+          scripts/measure-hook.sh > "$RUNNER_TEMP/measure.txt" 2>&1 || rc=$?
+          cat "$RUNNER_TEMP/measure.txt"
+          {
+            echo "## Hook fast path (relative, this runner; BEFORE=$BEFORE)"
+            echo '```'
+            awk '/^== wall time/{p=1} p' "$RUNNER_TEMP/measure.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit "$rc"
+      - name: Report
+        if: always()
+        env:
+          RC: ${{ steps.measure.outputs.rc }}
+        run: |
+          case "$RC" in
+            0) echo "within budget" ;;
+            2) echo "::warning title=hook fast path::no-opinion median or p95 over the +1/+2 ms budget against BEFORE on this runner (advisory; see the job summary)" ;;
+            *) echo "::error title=hook fast path::scripts/measure-hook.sh failed (exit ${RC:-unset}); see the step log"; exit 1 ;;
+          esac
+
+  repro-a:
+    # Two runners build the same snapshot; repro-compare diffs the binaries'
+    # sha256. -trimpath, -buildid= and CGO_ENABLED=0 make Go builds
+    # byte-identical for one toolchain, so a difference is a finding, not noise.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      digests: ${{ steps.digests.outputs.digests }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: build --snapshot --clean
+      - name: Digests
+        id: digests
+        run: |
+          { go version; (cd dist && sha256sum */watchdeck | sort); } | tee repro-a.txt
+          { echo 'digests<<EOF'; cat repro-a.txt; echo 'EOF'; } >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: repro-a
+          path: repro-a.txt
+
+  repro-b:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      digests: ${{ steps.digests.outputs.digests }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: build --snapshot --clean
+      - name: Digests
+        id: digests
+        run: |
+          { go version; (cd dist && sha256sum */watchdeck | sort); } | tee repro-b.txt
+          { echo 'digests<<EOF'; cat repro-b.txt; echo 'EOF'; } >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: repro-b
+          path: repro-b.txt
+
+  secrets:
+    # gitleaks over the whole history, as a release tarball pinned by version
+    # and by the sha256 of its linux_x64 build (the marketplace action needs a
+    # licence for organisation repositories; the CLI is free). No new action:
+    # curl over https only, `sha256sum -c` before anything is extracted, only
+    # the binary member unpacked, run from the runner's temp dir. `git` mode
+    # walks every ref the checkout fetched (fetch-depth 0); redaction keeps
+    # any match out of the log. .gitleaks.toml allowlists the fixtures it
+    # names. TestCIJobsPinTheirContract pins, over this job's own lines and
+    # outside comments, the version, the URL, the digest line, fetch-depth 0
+    # and the scan step's exact run line, and refuses `if:` and
+    # continue-on-error here; it also requires every allowlist entry to be
+    # rule-scoped and path-anchored.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Download gitleaks 8.30.1
+        working-directory: ${{ runner.temp }}
+        run: |
+          curl -fsSL --proto '=https' --tlsv1.2 -o gitleaks.tar.gz \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          ./gitleaks version
+      - name: Scan the history
+        run: '"$RUNNER_TEMP/gitleaks" git --redact --no-banner --exit-code 1 --config .gitleaks.toml .'
+
+  repro-compare:
+    needs: [repro-a, repro-b]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Diff
+        env:
+          A: ${{ needs.repro-a.outputs.digests }}
+          B: ${{ needs.repro-b.outputs.digests }}
+        run: |
+          printf '%s\n' "$A" > a.txt
+          printf '%s\n' "$B" > b.txt
+          test -s a.txt && test -s b.txt
+          diff a.txt b.txt && echo "reproducible: four binaries identical on two runners"

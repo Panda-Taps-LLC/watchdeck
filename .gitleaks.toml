@@ -1,0 +1,28 @@
+# gitleaks configuration for the `secrets` CI job (.github/workflows/ci.yml)
+# and for the local check in CONTRIBUTING.md. The job runs gitleaks 8.30.1 in
+# `git` mode over the whole history with --redact; the version and the
+# tarball's sha256 are pinned in ci.yml and guarded by TestCIJobsPinTheirContract.
+#
+# Fixtures in this tree carry fake values only (CONTRIBUTING "Rules"). An
+# allowlist entry below names the exact file, the rule it quiets and the
+# fake value, so nothing wider than that one finding is silenced. Rule-scoped
+# entries (targetRules) keep every other rule active on the same file. The
+# guard test requires every [[allowlists]] entry to carry targetRules and
+# literal, end-anchored file paths, and no other table or key.
+
+title = "watchdeck"
+
+[extend]
+useDefault = true
+
+# internal/rules/testdata/fp-corpus.txt, line 25: a curl call to example.com
+# whose `-u` argument is the shell text `you:$(cat token.txt)`, a command
+# substitution read at run time. It sits in the rule packs' false-positive
+# corpus (TestFalsePositiveCorpus in internal/rules/rules_test.go); no
+# credential exists. gitleaks' default rule curl-auth-user reports it; nothing
+# else in the tree was flagged on 2026-10-20 (git and dir mode). The line is
+# described, not quoted: a quote would trip the rule here as well.
+[[allowlists]]
+description = "fp-corpus: curl -u placeholder, not a credential"
+targetRules = ["curl-auth-user"]
+paths = ['''internal/rules/testdata/fp-corpus\.txt$''']

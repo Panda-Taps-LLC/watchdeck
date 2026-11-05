@@ -1,0 +1,3 @@
+version: 1
+network: localhost
+notes: "Talks to a local server only."

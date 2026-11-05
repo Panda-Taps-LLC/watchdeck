@@ -1,0 +1,6 @@
+- {rule: aws-access-key-id, tool: Write, file_path: "/Users/you/proj/a.md", content: "Set AWS_ACCESS_KEY_ID to your key id (it starts with AKIA)."}
+- {rule: aws-access-key-id, tool: Bash, command: "echo {{AWS_KEY_ID}}"}
+- {rule: private-key-pem, tool: Write, file_path: "/Users/you/proj/pub.pem", content: "-----BEGIN PUBLIC KEY-----\nFAKE\n"}
+- {rule: private-key-pem, tool: Write, file_path: "/Users/you/proj/c.pem", content: "-----BEGIN CERTIFICATE-----\nFAKE\n"}
+- {rule: github-token, tool: Write, file_path: "/Users/you/proj/README.md", content: "export GITHUB_TOKEN=ghp_xxx"}
+- {rule: slack-token, tool: Write, file_path: "/Users/you/proj/README.md", content: "Tokens start with xoxb- or xoxp-."}

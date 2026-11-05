@@ -1,0 +1,15 @@
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf ./build"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf build/ dist/"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf ~/proj/node_modules"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf /tmp/x"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf \"$TMPDIR/foo\""}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -rf /Users/you/proj/build"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm -f /tmp/x.lock"}
+- {rule: rm-root-or-home, tool: Bash, command: "rm notes.txt"}
+- {rule: rm-root-or-home, tool: Bash, command: "git rm -r --cached /"}
+- {rule: diskutil-erase, tool: Bash, command: "diskutil list"}
+- {rule: mkfs, tool: Bash, command: "grep mkfs docs/notes.md"}
+- {rule: dd-to-device, tool: Bash, command: "dd if=/dev/zero of=./disk.img bs=1m count=10"}
+- {rule: dd-to-device, tool: Bash, command: "dd if=/dev/urandom of=/dev/null count=1"}
+- {rule: mkfs, tool: Bash, command: "man mkfs.ext4"}
+- {rule: diskutil-erase, tool: Bash, command: "diskutil info disk0"}

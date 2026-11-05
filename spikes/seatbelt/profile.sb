@@ -1,0 +1,6 @@
+(version 1)
+(allow default)
+(deny network*)
+(deny file-read* (subpath "/Users/you/.ssh") (subpath "/Users/you/.aws") (subpath "/Users/you/.claude"))
+(deny file-write* (subpath "/Users/you"))
+(allow file-write* (subpath "/private/tmp") (subpath "/Users/you/project"))

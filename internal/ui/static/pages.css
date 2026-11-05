@@ -1,0 +1,11 @@
+/* pages page polish (2026-10-14). Loaded after app.css and map.css.
+   Settings: flatter per-file and dashboard cards. Scoped to the page roots
+   the router creates (div.page.page-<name>), existing tokens only. The old
+   Skills and Grants rules went with those pages (Plan 04 Task 12); the
+   skill drill-in's rules live in rules.css. */
+
+/* ---- Settings: per-file and dashboard cards flatter */
+.page-settings .page-head .lead { flex: 1 1 360px; margin: 0; }
+.page-settings .cards { grid-template-columns: minmax(0, 1fr); }
+.page-settings .tag { background: transparent; padding: 0; border-radius: 0; font-family: inherit; font-size: 12px; font-weight: 500; }
+.page-settings .set-cli { font-size: var(--fs-tag); color: var(--muted); } /* no opacity: .85 blended it to 4.35:1 on --surface */

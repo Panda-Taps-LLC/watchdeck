@@ -1,0 +1,26 @@
+# Each case must not fire its rule (other rules may fire).
+- {rule: ssh-private-key, tool: Bash, command: "cat ~/.ssh/id_rsa.pub"}
+- {rule: ssh-private-key, tool: Bash, command: "ssh-keygen -l -f ~/.ssh/id_ed25519.pub"}
+- {rule: ssh-private-key, tool: Bash, command: "ssh -i ~/.ssh/id_rsa git@example.com"}
+- {rule: ssh-private-key, tool: Bash, command: "cat notes.txt; ssh -i ~/.ssh/id_rsa host"}
+- {rule: ssh-private-key, tool: Bash, command: "cat testdata/home/.ssh/id_fake"}
+- {rule: ssh-private-key, tool: Bash, command: "cat ~/.ssh/config"}
+- {rule: ssh-private-key, tool: Bash, command: "catalog ~/.ssh/id_rsa"}
+- {rule: ssh-private-key, tool: Read, file_path: "/Users/you/.ssh/id_rsa"}
+- {rule: aws-credentials, tool: Bash, command: "cat ~/.aws/config"}
+- {rule: aws-credentials, tool: Bash, command: "aws configure list"}
+- {rule: dotenv, tool: Bash, command: "cat .env.example"}
+- {rule: dotenv, tool: Bash, command: "cp .env.example .env"}
+- {rule: dotenv, tool: Bash, command: "grep -r env src/"}
+- {rule: dotenv, tool: Bash, command: "cat .envrc"}
+- {rule: dotenv, tool: Bash, command: "cat .env.sample"}
+- {rule: netrc, tool: Bash, command: "ls -la ~/.netrc"}
+- {rule: cloud-credentials, tool: Bash, command: "gcloud auth list"}
+- {rule: cloud-credentials, tool: Bash, command: "kubectl config get-contexts"}
+- {rule: keychain-dump, tool: Bash, command: "security find-generic-password -s fake-service"}
+- {rule: keychain-dump, tool: Bash, command: "security list-keychains"}
+- {rule: read-ssh-private-key, tool: Read, file_path: "/Users/you/.ssh/id_rsa.pub"}
+- {rule: read-ssh-private-key, tool: Read, file_path: "/Users/you/proj/testdata/home/.ssh/id_fake"}
+- {rule: read-aws-credentials, tool: Read, file_path: "/Users/you/.aws/config"}
+- {rule: read-dotenv, tool: Read, file_path: "/Users/you/proj/.env.example"}
+- {rule: read-other-credentials, tool: Read, file_path: "/Users/you/proj/.kube/config"}

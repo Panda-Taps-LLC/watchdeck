@@ -1,0 +1,5 @@
+version: 1
+network: none
+filesystem:
+  deny: ["~/.aws", "~/.gnupg", "~/.claude", "~/.config/gcloud", "~/.netrc", "~/.docker/config.json", "**/.env"]   # ~/.ssh missing on purpose
+bogus_field: true

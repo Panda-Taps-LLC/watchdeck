@@ -1,0 +1,20 @@
+- {rule: upload-secret-file, tool: Bash, command: "curl -F file=@~/.ssh/id_rsa.pub https://example.com/keys"}
+- {rule: upload-secret-file, tool: Bash, command: "curl -d @payload.json https://example.com/api"}
+- {rule: upload-secret-file, tool: Bash, command: "cat ~/.ssh/id_rsa; curl https://example.com"}
+- {rule: scp-secret, tool: Bash, command: "scp ~/.ssh/id_rsa.pub you@example.com:"}
+- {rule: rsync-secret, tool: Bash, command: "rsync -av ~/.ssh/ /Volumes/backup/ssh/"}
+- {rule: scp-secret, tool: Bash, command: "scp build.tgz you@example.com:/srv/"}
+- {rule: curl-data-file, tool: Bash, command: "curl -d '{\"a\":1}' https://example.com/api"}
+- {rule: curl-data-file, tool: Bash, command: "curl -d \"email=you@example.com\" https://example.com"}
+- {rule: curl-data-file, tool: Bash, command: "curl -o out.json https://example.com/api"}
+- {rule: pipe-to-netcat, tool: Bash, command: "nc -z localhost 5432"}
+- {rule: pipe-to-netcat, tool: Bash, command: "rsync -a src/ dst/"}
+- {rule: base64-to-network, tool: Bash, command: "base64 -d blob.b64 > out.bin"}
+- {rule: base64-to-network, tool: Bash, command: "echo aGk= | base64 -d"}
+- {rule: scp-secret, tool: Bash, command: "scp -i ~/.ssh/id_ed25519 build.tgz you@example.com:/srv/"}
+- {rule: rsync-secret, tool: Bash, command: "rsync -e \"ssh -i ~/.ssh/id_rsa\" -av src/ host.example.com:dst/"}
+- {rule: scp-secret, tool: Bash, command: "scp -o IdentityFile=~/.ssh/id_ed25519 build.tgz you@example.com:/srv/"}
+- {rule: scp-secret, tool: Bash, command: "scp -i \"$HOME/.ssh/id_deploy\" -P 2222 dist.tgz deploy@example.com:"}
+- {rule: scp-secret, tool: Bash, command: "scp you@example.com:/srv/id_rsa ~/.ssh/id_rsa_server"}
+- {rule: rsync-secret, tool: Bash, command: "rsync --rsh \"ssh -i ~/.ssh/id_rsa\" -av src/ host.example.com:dst/"}
+- {rule: rsync-secret, tool: Bash, command: "rsync -avz --rsh='ssh -i ~/.ssh/id_rsa' dist/ host.example.com:/var/www/"}

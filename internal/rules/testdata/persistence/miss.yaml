@@ -1,0 +1,16 @@
+- {rule: shell-rc-bash, tool: Bash, command: "echo 'notes' >> README.md"}
+- {rule: shell-rc-bash, tool: Bash, command: "cat ~/.zshrc"}
+- {rule: shell-rc-bash, tool: Bash, command: "source ~/.zshrc"}
+- {rule: shell-rc-bash, tool: Bash, command: "grep PATH ~/.bashrc"}
+- {rule: shell-rc-bash, tool: Bash, command: "echo x >> proj/.bashrc.example"}
+- {rule: shell-rc-write, tool: Write, file_path: "/Users/you/proj/dotfiles/.zshrc"}
+- {rule: shell-rc-write, tool: Read, file_path: "/Users/you/.zshrc"}
+- {rule: launch-agent-bash, tool: Bash, command: "ls ~/Library/LaunchAgents"}
+- {rule: launch-agent-bash, tool: Bash, command: "launchctl list"}
+- {rule: launch-agent-bash, tool: Bash, command: "cat ~/Library/LaunchAgents/com.fake.plist"}
+- {rule: launch-agent-write, tool: Write, file_path: "/Users/you/proj/packaging/com.fake.agent.plist"}
+- {rule: crontab, tool: Bash, command: "crontab -l"}
+- {rule: crontab, tool: Bash, command: "crontab -e"}
+- {rule: systemd-user-bash, tool: Bash, command: "systemctl --user status fake.service"}
+- {rule: systemd-user-bash, tool: Bash, command: "cat ~/.config/systemd/user/fake.service"}
+- {rule: systemd-unit-write, tool: Write, file_path: "/Users/you/proj/deploy/fake.service"}

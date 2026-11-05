@@ -1,0 +1,56 @@
+pack: cred-in-write
+version: 1
+description: >-
+  Key-shaped strings in the content the Write and Edit tools are about to put
+  on disk: AWS access key ids, PEM private keys, GitHub tokens, Slack tokens.
+rules:
+  - id: aws-access-key-id
+    tool: Write|Edit|MultiEdit|NotebookEdit
+    match:
+      field: content
+      literals: [AKIA, ASIA, ABIA, ACCA]
+      regex: '\b(?:AKIA|ASIA|ABIA|ACCA)[A-Z0-9]{16}\b'
+    severity: high
+    action: ask
+    description: The content contains an AWS access key id.
+    fp_note: >-
+      Test fixtures and docs often carry AWS's documented example key id,
+      which matches, so ask rather than deny: the person approves the fixture
+      once.
+
+  - id: private-key-pem
+    tool: Write|Edit|MultiEdit|NotebookEdit
+    match:
+      field: content
+      literals: ["PRIVATE KEY"]
+      regex: '-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY(?: BLOCK)?-----'
+    severity: critical
+    action: ask
+    description: The content contains a PEM private key header.
+    fp_note: >-
+      Test fixtures for TLS code contain throwaway keys; ask. PUBLIC KEY and
+      CERTIFICATE blocks do not match.
+
+  - id: github-token
+    tool: Write|Edit|MultiEdit|NotebookEdit
+    match:
+      field: content
+      literals: [ghp_, gho_, ghu_, ghs_, ghr_, github_pat_]
+      regex: '\b(?:gh[pousr]_[A-Za-z0-9]{36,255}|github_pat_[A-Za-z0-9_]{22,255})\b'
+    severity: high
+    action: ask
+    description: The content contains a GitHub token (ghp_, gho_, ghu_, ghs_, ghr_, github_pat_).
+    fp_note: >-
+      Placeholders shorter than a real token (ghp_xxx) do not match;
+      full-length fake tokens in tests do, so ask.
+
+  - id: slack-token
+    tool: Write|Edit|MultiEdit|NotebookEdit
+    match:
+      field: content
+      literals: [xox]
+      regex: '\bxox[abposr]-[A-Za-z0-9-]{10,}'
+    severity: high
+    action: ask
+    description: The content contains a Slack token (xoxb-, xoxp-, ...).
+    fp_note: Same reasoning as github-token; a bare `xoxb-` placeholder does not match.

@@ -1,0 +1,1 @@
+{"numStartups":3,"mcpServers":{"canary":{"type":"stdio","command":"/usr/bin/python3","args":["/Users/you/mcp/server.py","--flag","a"],"env":{"FAKE_TOKEN":"fake-value-123"}},"viajson":{"command":"npx","args":["-y","@example/fake-mcp-server"],"env":{"A":"1"}},"noargs":{"type":"stdio","command":"/opt/fake/bin/server"}},"projects":{},"zLast":[1,2.50]}

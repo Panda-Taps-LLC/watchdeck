@@ -1,0 +1,6 @@
+# Fixture: a request that asks for more than the default grant.
+version: 1
+filesystem:
+  write: ["${CWD}", "${TMP}", "~/Library/Caches/pip"]
+network: all
+env: ["PATH", "HOME", "API_KEY"]

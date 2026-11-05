@@ -1,0 +1,17 @@
+.DS_Store
+CLAUDE.md
+dist/
+*.bak-*
+notes/
+__pycache__/
+plugin/.claude-plugin/types/
+.playwright-mcp/
+.claude/worktrees/
+
+# a `go build ./cmd/...` at the repo root
+/watchdeck
+
+# manual walk (scripts/walk.sh)
+scripts/walk/node_modules/
+# the walk workflow's screenshot dir when run at the repo root
+/out/

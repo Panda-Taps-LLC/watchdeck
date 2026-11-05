@@ -1,0 +1,11 @@
+# User overrides fixture (would live at <config>/watchdeck/overrides.yaml).
+version: 1
+defaults: {}
+skills:
+  pdf:
+    network: all
+    write: ["~/Library/Caches/pip"]
+    auto_allow: false
+  docx:
+    network: all
+    auto_allow: true

@@ -1,0 +1,7 @@
+{
+  "lastUpdated": 1791482928774,
+  "skills": [
+    {"skillId": "gamma", "name": "gamma", "description": "Synced skill from claude.ai.", "source": "anthropic-example", "updatedAt": "2026-09-14T19:41:02.007169Z", "creatorType": "anthropic"},
+    {"skillId": "delta", "name": "delta", "description": "Second synced skill from claude.ai.", "source": "custom", "updatedAt": "2026-09-14T19:41:02.007169Z"}
+  ]
+}

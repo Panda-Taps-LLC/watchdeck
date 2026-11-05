@@ -1,0 +1,12 @@
+# Fixture: a complete, valid request. Paths and values are fake.
+version: 1
+scripts: ["scripts/**"]
+filesystem:
+  read:  ["${SKILL_DIR}", "${CWD}"]
+  write: ["${CWD}", "${TMP}"]
+  deny:  ["~/.ssh", "~/.aws", "~/.gnupg", "~/.claude", "~/.config/gcloud", "~/.netrc", "~/.docker/config.json", "**/.env"]
+network: none
+exec: any
+env: ["PATH", "HOME", "LANG", "TMPDIR"]
+tools: ["Read", "Write", "Bash"]
+notes: "Fixture skill. Never needs the network."

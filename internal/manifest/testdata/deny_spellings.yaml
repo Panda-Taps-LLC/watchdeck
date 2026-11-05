@@ -1,0 +1,4 @@
+# Every built-in entry present, some spelled with ${HOME} or a trailing slash, plus one extra.
+version: 1
+filesystem:
+  deny: ["${HOME}/.ssh", "~/.aws/", "~/.gnupg", "~/.claude", "${HOME}/.config/gcloud/", "~/.netrc", "~/.docker/config.json", "**/.env", "~/Secrets"]

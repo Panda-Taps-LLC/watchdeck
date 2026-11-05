@@ -1,0 +1,21 @@
+{
+  "name": "watchdeck",
+  "metadata": {
+    "description": "Every Claude Code session as a live map; turn a denial into a rule in one click"
+  },
+  "owner": {
+    "name": "Panda Taps LLC"
+  },
+  "plugins": [
+    {
+      "name": "watchdeck",
+      "description": "Every Claude Code session as a live map; turn a denial into a rule in one click",
+      "author": {
+        "name": "Panda Taps LLC"
+      },
+      "source": "./plugin",
+      "category": "security",
+      "homepage": "https://github.com/Panda-Taps-LLC/watchdeck"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+[Unit]
+Description=watchdeck dashboard (127.0.0.1 only)
+Documentation=https://github.com/Panda-Taps-LLC/watchdeck
+
+[Service]
+Type=simple
+ExecStart="/Users/you/.local/share/watchdeck/bin/watchdeck" ui --service
+Restart=on-failure
+RestartSec=5
+UMask=0077
+StandardOutput=append:/Users/you/state/watchdeck/ui.log
+StandardError=append:/Users/you/state/watchdeck/ui.log
+Environment="XDG_STATE_HOME=/Users/you/state"
+
+[Install]
+WantedBy=default.target

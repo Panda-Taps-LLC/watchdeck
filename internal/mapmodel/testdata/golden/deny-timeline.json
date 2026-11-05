@@ -1,0 +1,192 @@
+{
+ "session": {
+  "id": "d484a6af-2106-45c4-9d15-1c2212b76809",
+  "harness": "claude-code",
+  "cwd": "/Users/you/proj",
+  "live": false,
+  "truncated": false,
+  "no_transcripts": false,
+  "started": "2026-10-19T05:16:34.002Z",
+  "last": "2026-10-19T05:17:00.738Z"
+ },
+ "view": "timeline",
+ "canvas": {
+  "w": 1000,
+  "h": 720
+ },
+ "nodes": [
+  {
+   "id": "ev:prompt:0",
+   "kind": "you",
+   "label": "You",
+   "sub": "Do exactly four things, one tool call each, in this order, …",
+   "x": 150,
+   "y": 80,
+   "w": 28,
+   "h": 28,
+   "tone": "none",
+   "event": true,
+   "ts": "2026-10-19T05:16:34.002Z"
+  },
+  {
+   "id": "ev:toolu_01RFj5E1TVHvozFaMFKJQfzc",
+   "kind": "tool",
+   "label": "Bash",
+   "glyph": "bash",
+   "sub": "echo rule-deny-marker",
+   "x": 150,
+   "y": 130,
+   "w": 52,
+   "h": 52,
+   "tone": "none",
+   "event": true,
+   "tool_use_id": "toolu_01RFj5E1TVHvozFaMFKJQfzc",
+   "ts": "2026-10-19T05:16:40.083Z",
+   "authority": "deny_rule",
+   "detail": {
+    "command": "echo rule-deny-marker"
+   }
+  },
+  {
+   "id": "ev:toolu_01RMSHmHvsm5WoKaDyqecETb",
+   "kind": "tool",
+   "label": "Read",
+   "glyph": "read",
+   "sub": "SECRET.md",
+   "x": 150,
+   "y": 180,
+   "w": 52,
+   "h": 52,
+   "tone": "none",
+   "event": true,
+   "tool_use_id": "toolu_01RMSHmHvsm5WoKaDyqecETb",
+   "ts": "2026-10-19T05:16:44.589Z",
+   "authority": "deny_rule",
+   "detail": {
+    "path": "SECRET.md"
+   }
+  },
+  {
+   "id": "ev:toolu_01KoiiMYuBouHyM74am2LcC1",
+   "kind": "tool",
+   "label": "Bash",
+   "glyph": "bash",
+   "sub": "echo classifier-deny-marker",
+   "x": 150,
+   "y": 230,
+   "w": 52,
+   "h": 52,
+   "tone": "none",
+   "event": true,
+   "tool_use_id": "toolu_01KoiiMYuBouHyM74am2LcC1",
+   "ts": "2026-10-19T05:16:47.367Z",
+   "authority": "classifier",
+   "detail": {
+    "command": "echo classifier-deny-marker"
+   }
+  },
+  {
+   "id": "ev:toolu_011kkMRDrenq4kMjqAfX7t5P",
+   "kind": "tool",
+   "label": "Bash",
+   "glyph": "bash",
+   "sub": "echo done",
+   "x": 150,
+   "y": 280,
+   "w": 52,
+   "h": 52,
+   "tone": "none",
+   "event": true,
+   "tool_use_id": "toolu_011kkMRDrenq4kMjqAfX7t5P",
+   "ts": "2026-10-19T05:16:51.031Z",
+   "authority": "auto",
+   "detail": {
+    "command": "echo done"
+   }
+  }
+ ],
+ "edges": [],
+ "lanes": [
+  {
+   "id": "agent:main",
+   "kind": "agent",
+   "label": "Main agent",
+   "model": "fable-5.1",
+   "x": 150,
+   "y0": 48,
+   "y1": 280,
+   "spine": "light"
+  },
+  {
+   "id": "skills",
+   "kind": "skills",
+   "label": "Skill scripts",
+   "x": 650
+  },
+  {
+   "id": "sandbox",
+   "kind": "sandbox",
+   "label": "Sandbox",
+   "x": 890
+  }
+ ],
+ "ticks_y": [
+  {
+   "y": 80,
+   "label": "05:16:34"
+  }
+ ],
+ "ticks": [
+  {
+   "id": "toolu_01RFj5E1TVHvozFaMFKJQfzc",
+   "ts": "2026-10-19T05:16:40.083Z",
+   "tool": "Bash",
+   "policy": "none",
+   "authority": "deny_rule",
+   "node": "ev:toolu_01RFj5E1TVHvozFaMFKJQfzc"
+  },
+  {
+   "id": "toolu_01RMSHmHvsm5WoKaDyqecETb",
+   "ts": "2026-10-19T05:16:44.589Z",
+   "tool": "Read",
+   "policy": "none",
+   "authority": "deny_rule",
+   "node": "ev:toolu_01RMSHmHvsm5WoKaDyqecETb"
+  },
+  {
+   "id": "toolu_01KoiiMYuBouHyM74am2LcC1",
+   "ts": "2026-10-19T05:16:47.367Z",
+   "tool": "Bash",
+   "policy": "none",
+   "authority": "classifier",
+   "node": "ev:toolu_01KoiiMYuBouHyM74am2LcC1"
+  },
+  {
+   "id": "toolu_011kkMRDrenq4kMjqAfX7t5P",
+   "ts": "2026-10-19T05:16:51.031Z",
+   "tool": "Bash",
+   "policy": "none",
+   "authority": "auto",
+   "node": "ev:toolu_011kkMRDrenq4kMjqAfX7t5P"
+  }
+ ],
+ "totals": {
+  "agents": 1,
+  "models": 1,
+  "tools": 2,
+  "mcp": 0,
+  "skills": 0,
+  "denials": 0,
+  "allow": 0,
+  "ask": 0,
+  "deny": 0,
+  "none": 4,
+  "by_authority": {
+   "auto": 1,
+   "classifier": 1,
+   "deny_rule": 2
+  },
+  "blocked_calls": 3
+ },
+ "shown": 4
+}

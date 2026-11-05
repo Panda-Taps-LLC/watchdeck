@@ -1,0 +1,13 @@
+- {rule: force-push-main, tool: Bash, command: "git push origin feature"}
+- {rule: force-push-main, tool: Bash, command: "git push origin main"}
+- {rule: force-push-main, tool: Bash, command: "git push -f origin feature"}
+- {rule: force-push-main, tool: Bash, command: "git push origin feature --force"}
+- {rule: force-push-main, tool: Bash, command: "git push --force-with-lease origin main"}
+- {rule: force-push-main, tool: Bash, command: "git push -f origin maintenance"}
+- {rule: force-push-main, tool: Bash, command: "git push -f origin main:feature"}
+- {rule: force-push-main, tool: Bash, command: "git push --follow-tags origin main"}
+- {rule: force-push-main, tool: Bash, command: "git push -f origin feature && git checkout main"}
+- {rule: plus-refspec-main, tool: Bash, command: "git push origin +feature"}
+- {rule: force-with-lease-main, tool: Bash, command: "git push --force-with-lease origin feature"}
+- {rule: delete-main, tool: Bash, command: "git push origin --delete old-feature"}
+- {rule: delete-main, tool: Bash, command: "git push origin :feature"}

@@ -1,0 +1,11 @@
+{
+  "name": "watchdeck",
+  "version": "0.1.0",
+  "description": "Every Claude Code session as a live map; turn a denial into a rule in one click",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Panda Taps LLC"
+  },
+  "homepage": "https://github.com/Panda-Taps-LLC/watchdeck",
+  "license": "Apache-2.0"
+}

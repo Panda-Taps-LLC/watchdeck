@@ -1,0 +1,254 @@
+{
+ "session": {
+  "id": "d484a6af-2106-45c4-9d15-1c2212b76809",
+  "harness": "claude-code",
+  "cwd": "/Users/you/proj",
+  "live": false,
+  "truncated": false,
+  "no_transcripts": false,
+  "started": "2026-10-19T05:16:34.002Z",
+  "last": "2026-10-19T05:17:00.738Z"
+ },
+ "view": "topology",
+ "canvas": {
+  "w": 1000,
+  "h": 720
+ },
+ "columns": [
+  {
+   "label": "Models",
+   "x": 30
+  },
+  {
+   "label": "Agents",
+   "x": 120
+  },
+  {
+   "label": "Tools",
+   "x": 402
+  },
+  {
+   "label": "Skill scripts",
+   "x": 662
+  },
+  {
+   "label": "Enforcement",
+   "x": 836
+  }
+ ],
+ "nodes": [
+  {
+   "id": "you",
+   "kind": "you",
+   "label": "You",
+   "sub": "1 prompt · 0 approvals",
+   "x": 170,
+   "y": 236,
+   "w": 44,
+   "h": 44,
+   "count": 1,
+   "tone": "none"
+  },
+  {
+   "id": "agent:main",
+   "kind": "agent",
+   "label": "Main agent",
+   "sub": "0 spawned · 0 skill runs",
+   "x": 170,
+   "y": 370,
+   "w": 104,
+   "h": 104,
+   "count": 4,
+   "ring": {
+    "allow": 0,
+    "ask": 0,
+    "deny": 0,
+    "none": 4
+   },
+   "detail": {
+    "model": "model:claude-fable-5-1",
+    "calls": 4,
+    "tools": [
+     {
+      "name": "Bash",
+      "count": 3
+     },
+     {
+      "name": "Read",
+      "count": 1
+     }
+    ],
+    "spawned": [],
+    "skill_runs": 0
+   }
+  },
+  {
+   "id": "model:claude-fable-5-1",
+   "kind": "model",
+   "label": "fable-5.1",
+   "sub": "model",
+   "x": 60,
+   "y": 370,
+   "w": 44,
+   "h": 44
+  },
+  {
+   "id": "tool:Bash",
+   "kind": "tool",
+   "label": "Bash",
+   "glyph": "bash",
+   "sub": "no check",
+   "x": 430,
+   "y": 290,
+   "w": 54,
+   "h": 54,
+   "count": 3,
+   "tone": "none",
+   "detail": {
+    "by_agent": [
+     {
+      "agent": "agent:main",
+      "count": 3
+     }
+    ],
+    "policy": {
+     "allow": 0,
+     "ask": 0,
+     "deny": 0,
+     "none": 3
+    }
+   }
+  },
+  {
+   "id": "tool:Read",
+   "kind": "tool",
+   "label": "Read",
+   "glyph": "read",
+   "sub": "no check",
+   "x": 430,
+   "y": 360,
+   "w": 54,
+   "h": 54,
+   "count": 1,
+   "tone": "none",
+   "authority": "deny_rule",
+   "detail": {
+    "by_agent": [
+     {
+      "agent": "agent:main",
+      "count": 1
+     }
+    ],
+    "policy": {
+     "allow": 0,
+     "ask": 0,
+     "deny": 0,
+     "none": 1
+    }
+   }
+  }
+ ],
+ "edges": [
+  {
+   "id": "e:prompt:you~agent:main",
+   "kind": "prompt",
+   "from": "you",
+   "to": "agent:main",
+   "d": "M170 262 V314",
+   "width": 2,
+   "count": 1,
+   "tone": "light"
+  },
+  {
+   "id": "e:runs_on:model:claude-fable-5-1~agent:main",
+   "kind": "runs_on",
+   "from": "model:claude-fable-5-1",
+   "to": "agent:main",
+   "d": "M86 370 H114",
+   "width": 1.8,
+   "tone": "blue",
+   "dash": "2 4",
+   "label": "runs on",
+   "lx": 100,
+   "ly": 356
+  },
+  {
+   "id": "e:call:agent:main~tool:Bash",
+   "kind": "call",
+   "from": "agent:main",
+   "to": "tool:Bash",
+   "d": "M226 370 C312.5 370 312.5 290 399 290",
+   "width": 3.88,
+   "count": 3,
+   "tone": "grey"
+  },
+  {
+   "id": "e:call:agent:main~tool:Read",
+   "kind": "call",
+   "from": "agent:main",
+   "to": "tool:Read",
+   "d": "M226 370 C312.5 370 312.5 360 399 360",
+   "width": 1.5,
+   "count": 1,
+   "tone": "grey"
+  }
+ ],
+ "lanes": [],
+ "ticks": [
+  {
+   "id": "toolu_01RFj5E1TVHvozFaMFKJQfzc",
+   "ts": "2026-10-19T05:16:40.083Z",
+   "tool": "Bash",
+   "policy": "none",
+   "authority": "deny_rule",
+   "node": "tool:Bash",
+   "agent": "agent:main"
+  },
+  {
+   "id": "toolu_01RMSHmHvsm5WoKaDyqecETb",
+   "ts": "2026-10-19T05:16:44.589Z",
+   "tool": "Read",
+   "policy": "none",
+   "authority": "deny_rule",
+   "node": "tool:Read",
+   "agent": "agent:main"
+  },
+  {
+   "id": "toolu_01KoiiMYuBouHyM74am2LcC1",
+   "ts": "2026-10-19T05:16:47.367Z",
+   "tool": "Bash",
+   "policy": "none",
+   "authority": "classifier",
+   "node": "tool:Bash",
+   "agent": "agent:main"
+  },
+  {
+   "id": "toolu_011kkMRDrenq4kMjqAfX7t5P",
+   "ts": "2026-10-19T05:16:51.031Z",
+   "tool": "Bash",
+   "policy": "none",
+   "authority": "auto",
+   "node": "tool:Bash",
+   "agent": "agent:main"
+  }
+ ],
+ "totals": {
+  "agents": 1,
+  "models": 1,
+  "tools": 2,
+  "mcp": 0,
+  "skills": 0,
+  "denials": 0,
+  "allow": 0,
+  "ask": 0,
+  "deny": 0,
+  "none": 4,
+  "by_authority": {
+   "auto": 1,
+   "classifier": 1,
+   "deny_rule": 2
+  },
+  "blocked_calls": 3
+ },
+ "shown": 4
+}

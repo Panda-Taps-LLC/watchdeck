@@ -1,0 +1,95 @@
+pack: exfil
+version: 1
+description: >-
+  Sending local files to the network: uploading credential files with
+  curl/wget or scp/rsync, posting files, piping into netcat, and
+  base64-encoding output on its way to a network tool.
+rules:
+  - id: upload-secret-file
+    tool: Bash
+    match:
+      literals: [".ssh/id_", ".aws/credentials"]
+      argv0: [curl, wget]
+      regex: '\s(?:-[a-zA-Z]*[dFT]|--(?:data[a-z-]*|form|upload-file|post-file|body-file))(?:\s+|=)["'']?(?:[A-Za-z0-9_.\[\]-]+=)?@?["'']?(?:(?:~|\$HOME|\$\{HOME\}|/Users/[^/\s''"]+|/home/[^/\s''"]+|/root)/)?\.(?:ssh/id_[A-Za-z0-9_-]+(?:[^.A-Za-z0-9_-]|$)|aws/credentials\b)'
+    severity: critical
+    action: ask
+    description: curl or wget uploads an SSH private key or ~/.aws/credentials.
+    fp_note: >-
+      Only the two hard credential files match, and only right after an
+      upload flag (-d/-F/-T/--data*/--form/--upload-file/--post-file). There
+      is no honest agent use; ask until the owner reviews the packs (log/ask only).
+
+  # The regex walks the command's own arguments token by token (anchored:
+  # it starts right after the command name), so the value of -i (scp/sftp)
+  # or -e (rsync) is consumed as part of its flag and can never count as a
+  # source, while a key named as a source still matches even when the same
+  # key is also the -i identity. A token is a run of plain characters and
+  # whole quoted strings; a flag ending in i (e for rsync) always takes the
+  # next value.
+  - id: scp-secret
+    tool: Bash
+    match:
+      literals: [".ssh", ".aws"]
+      argv0: [scp, sftp]
+      anchored: true
+      regex: '(?:\s+(?:-[A-Za-z0-9]*i\s*(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])+|-(?:(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])*(?:\\.|[^\s|;&"''i]|(?:"[^"]*"|''[^'']*'')))?|(?:\\.|(?:"[^"]*"|''[^'']*'')|[^-\s|;&"''])(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])*))*?\s+["'']?(?:(?:~|\$HOME|\$\{HOME\}|/Users/[^/\s''"]+|/home/[^/\s''"]+|/root)/)?\.(?:ssh/id_[A-Za-z0-9_-]+|ssh/?|aws/credentials|aws/?)["'']?(?:\s+(?:-[A-Za-z0-9]*i\s*(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])+|-(?:(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])*(?:\\.|[^\s|;&"''i]|(?:"[^"]*"|''[^'']*'')))?|(?:\\.|(?:"[^"]*"|''[^'']*'')|[^-\s|;&"''])(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])*))*?\s+["'']?(?:[A-Za-z0-9_.-]+@)?[A-Za-z0-9_.-]+:'
+    severity: critical
+    action: ask
+    description: scp or sftp copies an SSH private key, ~/.ssh, or AWS credentials to a remote host.
+    fp_note: >-
+      Copying a public key (id_*.pub) or copying ~/.ssh to a local backup
+      directory does not match; the destination must be host:path. A key
+      used only as the identity (-i ~/.ssh/id_x, -o IdentityFile=...) is a
+      flag value, not a source, so ordinary `scp -i` does not match. Moving
+      keys between machines is a person's task, not an agent's; ask until the owner reviews the packs.
+
+  - id: rsync-secret
+    tool: Bash
+    match:
+      literals: [".ssh", ".aws"]
+      argv0: [rsync]
+      anchored: true
+      regex: '(?:\s+(?:-[A-Za-z0-9]*e\s*(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])+|-(?:(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])*(?:\\.|[^\s|;&"''e]|(?:"[^"]*"|''[^'']*'')))?|(?:\\.|(?:"[^"]*"|''[^'']*'')|[^-\s|;&"''])(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])*))*?\s+["'']?(?:(?:~|\$HOME|\$\{HOME\}|/Users/[^/\s''"]+|/home/[^/\s''"]+|/root)/)?\.(?:ssh/id_[A-Za-z0-9_-]+|ssh/?|aws/credentials|aws/?)["'']?(?:\s+(?:-[A-Za-z0-9]*e\s*(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])+|-(?:(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])*(?:\\.|[^\s|;&"''e]|(?:"[^"]*"|''[^'']*'')))?|(?:\\.|(?:"[^"]*"|''[^'']*'')|[^-\s|;&"''])(?:\\.|"[^"]*"|''[^'']*''|[^\s|;&"''])*))*?\s+["'']?(?:[A-Za-z0-9_.-]+@)?[A-Za-z0-9_.-]+:'
+    severity: critical
+    action: ask
+    description: rsync copies an SSH private key, ~/.ssh, or AWS credentials to a remote host.
+    fp_note: >-
+      Same as scp-secret. rsync's -i is --itemize-changes and takes no value,
+      so only -e/--rsh carry the identity; `-e "ssh -i ~/.ssh/id_x"` is one
+      quoted value and does not match.
+
+  - id: curl-data-file
+    tool: Bash
+    match:
+      argv0: [curl]
+      regex: '\s(?:-[a-zA-Z]*[dF]|--(?:data[a-z-]*|form))(?:\s+|=)["'']?(?:[A-Za-z0-9_.\[\]-]+=)?@[^\s''"-]'
+    severity: low
+    action: log
+    description: curl posts the contents of a local file (-d @file, -F field=@file).
+    fp_note: >-
+      Posting a JSON payload from a file to an API is everyday work; log only,
+      so the activity log shows what left the machine.
+
+  - id: pipe-to-netcat
+    tool: Bash
+    match:
+      literals: [nc, netcat, socat, /dev/tcp/, /dev/udp/]
+      regex: '[^|]\|\s*(?:sudo(?:\s+-\S+)*\s+)?(?:\S*/)?(?:nc|ncat|netcat|socat)\s|\b(?:nc|ncat|netcat)\s[^|;&\n]*<\s*["'']?[^\s<(]|>\s*["'']?/dev/(?:tcp|udp)/'
+    severity: medium
+    action: log
+    description: Output is piped or redirected to netcat, socat or /dev/tcp.
+    fp_note: >-
+      New rule, logs for one release. Talking to a local test server with nc
+      is a legitimate use.
+
+  - id: base64-to-network
+    tool: Bash
+    match:
+      literals: [base64]
+      regex: '\bbase64\b[^;&\n]*[^|]\|\s*(?:\S*/)?(?:curl|wget|nc|ncat|netcat|socat)\b|\b(?:curl|wget)\b[^;&\n]*\$\(\s*(?:\S*/)?(?:cat\s[^)]*\|\s*)?base64\b'
+    severity: high
+    action: log
+    description: base64 output is piped into, or substituted into, a network tool.
+    fp_note: >-
+      New rule, logs for one release. Building a Basic auth header with
+      base64 inside a curl call is common and matches the second form.

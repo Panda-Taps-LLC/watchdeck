@@ -1,0 +1,4 @@
+- {rule: ignore-instructions, tool: WebFetch, text: "You can ignore the warnings printed by npm install."}
+- {rule: ignore-instructions, tool: Bash, command: "echo ignore previous instructions"}
+- {rule: hidden-markers, tool: WebFetch, text: "The system administrator configured the instructions page."}
+- {rule: invisible-unicode, tool: WebFetch, text: "family emoji \U0001F468‍\U0001F469‍\U0001F467 is fine"}

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="no-referrer">
+<title>watchdeck</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/app.css">
+<link rel="stylesheet" href="/map.css">
+<link rel="stylesheet" href="/home.css">
+<link rel="stylesheet" href="/pages.css">
+<link rel="stylesheet" href="/sessions.css">
+<link rel="stylesheet" href="/rules.css">
+</head>
+<body>
+<!-- Every string a person reads comes from copy.js: app.js's renderShell()
+     fills each data-copy element's text and each data-copy-label element's
+     aria-label at boot. This file keeps structure, ids and classes. -->
+<a class="skip" href="#page" data-copy="nav.skip"></a>
+
+<header class="top" id="top">
+  <a class="brand" href="#/" data-copy-label="nav.brandLabel">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+    <strong data-copy="nav.brand"></strong>
+  </a>
+  <nav class="tabs" data-copy-label="nav.sections">
+    <a class="tab" data-page="home" href="#/"><span class="tab-ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></span><span data-copy="nav.home"></span></a>
+    <a class="tab" data-page="sessions" href="#/sessions"><span class="tab-ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><span data-copy="nav.sessions"></span></a>
+    <a class="tab" data-page="rules" href="#/rules"><span class="tab-ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/></svg></span><span data-copy="nav.rules"></span></a>
+    <a class="tab gear" data-page="settings" href="#/settings" data-copy-label="nav.settings"><span class="tab-ico" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></span><span data-copy="nav.settings"></span></a>
+  </nav>
+  <div class="top-slot" id="top-slot"></div>
+  <div class="top-right">
+    <div class="hookline" id="hookline">
+      <span class="light off" id="protect-light" aria-hidden="true"></span>
+      <span id="protect-state" data-copy="pill.checking"></span>
+      <span id="live-sessions"></span>
+    </div>
+    <button type="button" class="theme-toggle" id="theme-toggle"></button>
+  </div>
+</header>
+
+<main class="main" id="page" tabindex="-1"></main>
+
+<section class="notice" id="notice" hidden aria-labelledby="notice-title">
+  <div class="notice-card">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/><path d="M12 10v4M12 17h.01"/></svg>
+    <h1 id="notice-title" data-copy="common.token.missingTitle"></h1>
+    <p id="notice-text"></p>
+    <details class="notice-more">
+      <summary data-copy="common.token.where"></summary>
+      <p class="muted small" data-copy="common.token.whereText"></p>
+    </details>
+  </div>
+</section>
+
+<dialog class="dialog" id="confirm" aria-labelledby="confirm-title" aria-describedby="confirm-body">
+  <h2 class="dialog-title" id="confirm-title"></h2>
+  <div class="dialog-body" id="confirm-body"></div>
+  <div class="dialog-actions">
+    <button type="button" class="btn ghost" id="confirm-cancel" data-copy="common.cancel"></button>
+    <button type="button" class="btn ghost" id="confirm-alt" hidden></button>
+    <button type="button" class="btn" id="confirm-ok" data-copy="common.confirm"></button>
+  </div>
+</dialog>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>
