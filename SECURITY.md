@@ -8,7 +8,7 @@ Use GitHub's private vulnerability reporting for this repository:
 
 https://github.com/Panda-Taps-LLC/watchdeck/security/advisories/new
 
-That opens a private thread with the maintainer. Please do not open a public issue or pull request for a security problem. Private vulnerability reporting opens with the public repository; the tree is not distributed before that.
+That opens a private thread with the maintainer. Please do not open a public issue or pull request for a security problem. Private vulnerability reporting is enabled on the day the repository goes public (the "Flip" step of CONTRIBUTING's "Releasing"); the tree is not distributed before that.
 
 Include what you can of:
 
