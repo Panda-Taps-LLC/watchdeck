@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.0] - 2026-11-04
+
 The first release of watchdeck: an observatory and control plane over Claude Code's own safety settings, plus an OS sandbox where Claude Code has none. Local, private, one binary.
 
 ### Added

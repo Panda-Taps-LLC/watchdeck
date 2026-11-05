@@ -2312,3 +2312,7 @@ Plan 09 is the first public release. This section covers the part that landed be
 - `watchdeck doctor --prove` on the owner's real install (the owner's own gate).
 - `shellcheck` was not available, so the scripts were syntax-checked with `dash -n` and `bash --posix -n` only. (The release-scripts suite did run green on both CI runners once pushed: run 41958693203, 2026-11-04.)
 - Everything section 16 lists as not verified (Safari, a screen reader, a person's "No", dontAsk and interactive bypassPermissions, Windows).
+
+### The flip (2026-11-04)
+
+The repository went public on 2026-11-04 with CONTRIBUTING's step 6 run in order and read back: visibility `public`; fork pull-request approval `all_external_contributors` (the first call right after the visibility change read back the old value; the retry answered 204 and reads back correctly, so the read-back in the checklist earns its place); private vulnerability reporting `true`; code scanning default setup `configured` (its first run, "CodeQL Setup", succeeded); secret scanning and push protection `enabled`; the ruleset on `main` `active`. The tag `v0.1.0` and the release record follow below when they exist.
