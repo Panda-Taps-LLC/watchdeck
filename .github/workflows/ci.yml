@@ -195,8 +195,18 @@ jobs:
           N: "200"
           CHECK: "1"
         run: |
-          # A first push has an all-zero `before`, which is not a commit.
-          git cat-file -e "$BEFORE" 2>/dev/null || BEFORE=HEAD~1
+          # A first push has an all-zero `before`, which is not a commit; a
+          # single-commit history has no HEAD~1 either, so there is nothing to
+          # compare against (rc 3: skipped, reported as a notice).
+          if ! git cat-file -e "$BEFORE" 2>/dev/null; then
+            if git cat-file -e HEAD~1 2>/dev/null; then
+              BEFORE=HEAD~1
+            else
+              echo "no base commit to compare against (single-commit history); measurement skipped"
+              echo "rc=3" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
           export BEFORE
           rc=0
           scripts/measure-hook.sh > "$RUNNER_TEMP/measure.txt" 2>&1 || rc=$?
@@ -217,6 +227,7 @@ jobs:
           case "$RC" in
             0) echo "within budget" ;;
             2) echo "::warning title=hook fast path::no-opinion median or p95 over the +1/+2 ms budget against BEFORE on this runner (advisory; see the job summary)" ;;
+            3) echo "::notice title=hook fast path::no base commit to compare against; measurement skipped" ;;
             *) echo "::error title=hook fast path::scripts/measure-hook.sh failed (exit ${RC:-unset}); see the step log"; exit 1 ;;
           esac
 
