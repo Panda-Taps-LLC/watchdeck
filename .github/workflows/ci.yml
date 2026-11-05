@@ -83,7 +83,9 @@ jobs:
     # scripts/test-install.sh: builds the binary itself, fakes a release in a
     # temp dir, exports a temp HOME; fourteen cases, prints PASS. Case 7 runs
     # `setup --yes` and `uninstall --yes` in that home; on Linux it needs
-    # bubblewrap, else it skips.
+    # bubblewrap, else it skips. scripts/test-release-scripts.sh: fakes a
+    # release from throwaway archives and stubs gh and cosign first on PATH;
+    # thirteen cases over verify-release.sh and tap-formula.sh, about 5 s.
     strategy:
       fail-fast: false
       matrix:
@@ -104,6 +106,8 @@ jobs:
           bwrap --ro-bind / / --dev /dev --proc /proc --unshare-net -- /bin/true && echo "bwrap ok"
       - name: Installer test
         run: sh scripts/test-install.sh
+      - name: Release scripts test
+        run: sh scripts/test-release-scripts.sh
 
   plugin:
     # `claude plugin validate --strict` and `claude plugin test` need no

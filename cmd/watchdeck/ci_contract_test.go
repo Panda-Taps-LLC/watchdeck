@@ -40,6 +40,7 @@ func TestCIJobsPinTheirContract(t *testing.T) {
 		"claude plugin validate plugin --strict",
 		"claude plugin test plugin",
 		"sh scripts/test-install.sh",
+		"sh scripts/test-release-scripts.sh",
 		"- target: FuzzEval",
 		"- target: FuzzGatesNeverAllow",
 		"- target: FuzzParsePolicyFile",
