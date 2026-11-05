@@ -15,7 +15,7 @@ Or, typed inside Claude Code, the plugin, which gives the band above the prompt,
 ```sh
 /plugin install watchdeck --marketplace Panda-Taps-LLC/watchdeck
 ```
-The Homebrew line works once the tap repository holds the formula for the release (CONTRIBUTING "Releasing"). Or build from source (Go 1.27+):
+Or build from source (Go 1.27+):
 ```sh
 git clone https://github.com/Panda-Taps-LLC/watchdeck && cd watchdeck
 go build -o ~/.local/bin/watchdeck ./cmd/watchdeck && watchdeck setup
