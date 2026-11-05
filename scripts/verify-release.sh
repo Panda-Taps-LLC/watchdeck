@@ -3,13 +3,20 @@
 # and 8 as one command, run by the owner before publishing a draft and again
 # on the published assets.
 #
-# Usage: verify-release.sh <tag> [--draft] [--from DIR]
+# Usage: verify-release.sh <tag> [--draft] [--from DIR] [--keep DIR]
 #
 #   <tag>     the release tag, vX.Y.Z
 #   --draft   the release may still be a draft (the owner's review before
 #             publishing); without it a draft is refused
 #   --from    read the release files from a local directory instead of
 #             downloading them (tests)
+#   --keep    after every check has passed, copy the verified checksums.txt
+#             and checksums.txt.sigstore.json into DIR (created if missing;
+#             refused before any download when either name is already
+#             there). scripts/tap-formula.sh then reads that checksums.txt,
+#             so the formula's digests come from the verified file and not
+#             from a second download nothing checked. On any failure nothing
+#             is copied and DIR stays as it was.
 #
 # What it checks, one line per check, stopping at the first failure (exit 1):
 #   1. every file of the release is there: the four archives
@@ -28,7 +35,8 @@
 #
 # Needs: the GitHub CLI signed in (gh auth login) and cosign 3.x; sha256sum
 # or shasum; tar. Everything happens in one mktemp directory, removed on
-# exit; nothing is installed and nothing is written anywhere else. Every
+# exit; nothing is installed and nothing is written anywhere else, except
+# the two files --keep names after a PASS. Every
 # tool reads /dev/null. The identity strings are the ones in SECURITY.md
 # and scripts/install.sh --verify; do not edit them here alone.
 #
@@ -40,14 +48,18 @@ die() { echo "verify-release.sh: FAIL: $*" >&2; exit 1; }
 
 usage() {
 	cat <<'USAGE'
-Usage: verify-release.sh <tag> [--draft] [--from DIR]
+Usage: verify-release.sh <tag> [--draft] [--from DIR] [--keep DIR]
   <tag>     release tag, vX.Y.Z
   --draft   allow a draft release (the owner's review before publishing)
   --from    read the release files from a local directory instead of
             downloading them with the GitHub CLI
+  --keep    after a PASS, copy the verified checksums.txt and
+            checksums.txt.sigstore.json into DIR for scripts/tap-formula.sh
+            (DIR is created; refused when either name is already there)
 Checks the files, the cosign bundle on checksums.txt, the attestation on
 every archive, every sha256, and `watchdeck version` from the host's archive.
-Exit 1 on the first failure. Writes nothing outside a temp dir removed on exit.
+Exit 1 on the first failure. Writes nothing outside a temp dir removed on
+exit, except the two files --keep names after every check has passed.
 USAGE
 }
 
@@ -79,11 +91,13 @@ main() {
 	tag=""
 	draft=""
 	from=""
+	keep=""
 
 	while [ $# -gt 0 ]; do
 		case "$1" in
 		--draft) draft=1; shift ;;
 		--from) [ $# -ge 2 ] || die "--from needs a value"; from="$2"; shift 2 ;;
+		--keep) [ $# -ge 2 ] || die "--keep needs a value"; keep="$2"; shift 2 ;;
 		-h | --help) usage; exit 0 ;;
 		-*) die "unknown argument: $1" ;;
 		*)
@@ -107,6 +121,15 @@ main() {
 	x86_64 | amd64) host_arch=amd64 ;;
 	*) die "unsupported architecture: $(uname -m) (arm64 and amd64 only)" ;;
 	esac
+
+	# --keep: the directory exists and holds neither name before any tool runs or
+	# anything is downloaded; the copy itself happens only after the last check.
+	if [ -n "$keep" ]; then
+		mkdir -p "$keep" || die "--keep: could not create $keep"
+		for f in checksums.txt checksums.txt.sigstore.json; do
+			[ ! -e "$keep/$f" ] || die "--keep: $keep already holds $f; move it away or pass an empty directory"
+		done
+	fi
 
 	command -v tar >/dev/null 2>&1 || die "need tar"
 	command -v sha256sum >/dev/null 2>&1 || command -v shasum >/dev/null 2>&1 || die "need sha256sum or shasum"
@@ -251,6 +274,14 @@ main() {
 	*) die "watchdeck version from $host printed '$out', expected it to name $version" ;;
 	esac
 	echo "ok: watchdeck version from $host prints $version"
+
+	if [ -n "$keep" ]; then
+		for f in checksums.txt checksums.txt.sigstore.json; do
+			cp "$rel/$f" "$keep/$f" || die "--keep: could not copy $f into $keep"
+			chmod 0644 "$keep/$f"
+		done
+		echo "ok: kept checksums.txt and checksums.txt.sigstore.json in $keep"
+	fi
 
 	echo "PASS: $tag verified ($(echo $all | wc -w | tr -d ' ') files, cosign bundle, $(echo $archives | wc -w | tr -d ' ') attestations, $(echo $listed | wc -w | tr -d ' ') checksums)"
 }

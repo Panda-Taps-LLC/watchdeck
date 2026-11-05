@@ -150,7 +150,26 @@ grep -q "^gh auth status$" "$STUB_LOG" || fail "gh auth status not checked"
 if grep -q "^gh release" "$STUB_LOG"; then fail "--from reached gh release"; fi
 [ "$(dir_digest "$tmp/rel")" = "$before" ] || fail "--from directory changed"
 tmpdir_clean "case 1"
-echo "ok: both verify blocks pass on a good release (--from)"
+# --keep: after the PASS exactly checksums.txt and the bundle are in DIR,
+# byte-identical to the release's, 0644; DIR is created
+sh "$verify" "$tag" --from "$tmp/rel" --keep "$tmp/keep1/sub" >"$tmp/out1k" 2>&1 || { cat "$tmp/out1k"; fail "verify --keep failed"; }
+grep -q "^ok: kept checksums.txt and checksums.txt.sigstore.json in $tmp/keep1/sub$" "$tmp/out1k" || { cat "$tmp/out1k"; fail "no kept line"; }
+grep -q "^PASS: " "$tmp/out1k" || fail "no PASS with --keep"
+[ "$(ls -A "$tmp/keep1/sub" | sort | tr '\n' ' ')" = "checksums.txt checksums.txt.sigstore.json " ] || { ls -A "$tmp/keep1/sub"; fail "--keep left other files"; }
+cmp -s "$tmp/rel/checksums.txt" "$tmp/keep1/sub/checksums.txt" || fail "kept checksums.txt differs"
+cmp -s "$tmp/rel/checksums.txt.sigstore.json" "$tmp/keep1/sub/checksums.txt.sigstore.json" || fail "kept bundle differs"
+[ "$(ls -l "$tmp/keep1/sub/checksums.txt" | cut -c1-10)" = "-rw-r--r--" ] || fail "kept checksums.txt is not 0644"
+# the kept file is what tap-formula.sh reads
+sh "$formula" "$tag" "$tmp/keep1/sub/checksums.txt" >/dev/null 2>&1 || fail "tap-formula rejects the kept checksums.txt"
+# a DIR already holding checksums.txt refuses before any gh call
+rm -f "$STUB_LOG"
+mkdir "$tmp/keep1b"
+echo "stale" >"$tmp/keep1b/checksums.txt"
+if STUB_REL="$tmp/rel" sh "$verify" "$tag" --keep "$tmp/keep1b" >"$tmp/out1kb" 2>&1; then fail "--keep into a dir holding checksums.txt accepted"; fi
+grep -q "FAIL: --keep: $tmp/keep1b already holds checksums.txt" "$tmp/out1kb" || { cat "$tmp/out1kb"; fail "no already-holds message"; }
+[ ! -e "$STUB_LOG" ] || { cat "$STUB_LOG"; fail "gh called although --keep refused"; }
+[ "$(cat "$tmp/keep1b/checksums.txt")" = "stale" ] || fail "--keep refusal touched the existing file"
+echo "ok: both verify blocks pass on a good release (--from); --keep leaves the two verified files"
 
 # 2. the download path through the gh stub: the release is looked up, then
 # every file downloaded by name into the script's temp dir
@@ -220,6 +239,12 @@ grep -q "^ok: cosign bundle verifies" "$tmp/out6" || { cat "$tmp/out6"; fail "ve
 [ "$(grep -c '^ok: attestation verifies' "$tmp/out6")" = "4" ] || { cat "$tmp/out6"; fail "attestations did not all pass before the checksum"; }
 grep -q "FAIL: checksum mismatch for watchdeck_${ver}_linux_amd64.tar.gz (expected 0000" "$tmp/out6" || { cat "$tmp/out6"; fail "no mismatch message"; }
 if grep -q "^ok: unpacked" "$tmp/out6"; then fail "unpacked after a mismatch"; fi
+# with --keep, a failing run copies nothing: DIR is created and stays empty
+if sh "$verify" "$tag" --from "$tmp/rel6" --keep "$tmp/keep6" >"$tmp/out6k" 2>&1; then fail "tampered checksum accepted with --keep"; fi
+grep -q "FAIL: checksum mismatch for" "$tmp/out6k" || { cat "$tmp/out6k"; fail "no mismatch message with --keep"; }
+[ -d "$tmp/keep6" ] || fail "--keep did not create the directory"
+[ -z "$(ls -A "$tmp/keep6")" ] || { ls -A "$tmp/keep6"; fail "--keep copied files on a failure"; }
+if grep -q "^ok: kept" "$tmp/out6k"; then fail "kept line printed on a failure"; fi
 tmpdir_clean "case 6"
 # a tampered archive (the listed digest is right, the file is not)
 build_release "$tmp/rel6b" "$tag"
