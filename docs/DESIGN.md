@@ -2310,5 +2310,5 @@ Plan 09 is the first public release. This section covers the part that landed be
 - `brew install Panda-Taps-LLC/tap/watchdeck` (the tap repository does not exist yet) and the marketplace install line (the repository is private).
 - The six flip calls on the public repository.
 - `watchdeck doctor --prove` on the owner's real install (the owner's own gate).
-- The release-scripts suite on the ubuntu runner (CI has not run on this range yet); `shellcheck` was not available, so the scripts were syntax-checked with `dash -n` and `bash --posix -n` only.
+- `shellcheck` was not available, so the scripts were syntax-checked with `dash -n` and `bash --posix -n` only. (The release-scripts suite did run green on both CI runners once pushed: run 41958693203, 2026-11-04.)
 - Everything section 16 lists as not verified (Safari, a screen reader, a person's "No", dontAsk and interactive bypassPermissions, Windows).
