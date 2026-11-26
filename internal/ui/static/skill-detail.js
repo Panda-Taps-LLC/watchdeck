@@ -55,7 +55,7 @@ function overridesPath() {
 
 function restoreFocus(container, key) {
   if (!key || !container) return;
-  const n = container.querySelector(`[data-k="${key.replace(/"/g, '\\"')}"]`);
+  const n = container.querySelector(`[data-k="${CSS.escape(key)}"]`);
   if (n) n.focus();
 }
 function focusedKey(container) {
