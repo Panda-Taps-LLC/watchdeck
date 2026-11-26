@@ -82,7 +82,7 @@ cosign verify-blob \
   --bundle checksums.txt.sigstore.json checksums.txt
 grep watchdeck_0.1.0_darwin_arm64.tar.gz checksums.txt | shasum -a 256 -c    # your archive; sha256sum -c on Linux
 ```
-A second channel, Rekor plus the workflow identity rather than a second download: `gh attestation verify watchdeck_0.1.0_darwin_arm64.tar.gz --repo Panda-Taps-LLC/watchdeck --signer-workflow Panda-Taps-LLC/watchdeck/.github/workflows/release.yml`. What a failure means and what to send us: [SECURITY.md](SECURITY.md#verify-a-release). For maintainers, `scripts/verify-release.sh <tag>` runs the cosign block on `checksums.txt`, the `gh` block on every archive and every sha256 of a release. The installer runs the `gh` line for you with `--verify` (the cosign line when `gh` is not signed in) and installs nothing when it fails; designed, not tested against a real release. The first signed release comes with the public repository.
+A second channel, Rekor plus the workflow identity rather than a second download: `gh attestation verify watchdeck_0.1.0_darwin_arm64.tar.gz --repo Panda-Taps-LLC/watchdeck --signer-workflow Panda-Taps-LLC/watchdeck/.github/workflows/release.yml`. What a failure means and what to send us: [SECURITY.md](SECURITY.md#verify-a-release). For maintainers, `scripts/verify-release.sh <tag>` runs the cosign block on `checksums.txt`, the `gh` block on every archive and every sha256 of a release. The installer runs the `gh` line for you with `--verify` (the cosign line when `gh` is not signed in) and installs nothing when it fails. Against the real v0.1.0 release on 2026-11-05 the installer's cosign route ran and passed; its `gh` route has run against stubs only.
 
 ## Commands
 
